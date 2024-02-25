@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@owlbear-rodeo/sdk": "^2.3.0",
+    "@vueuse/components": "^10.8.0",
+    "@vueuse/core": "^10.8.0",
     "vue": "^3.4.19"
   },
   "devDependencies": {
