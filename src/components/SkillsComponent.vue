@@ -1,15 +1,11 @@
 <script setup>
 import { ref, toRefs } from 'vue'
+import { capitalize } from '../parseFunctions';
 
 const props = defineProps({
     monster: Object
 })
 const {monster} = toRefs(props)
-
-const capitalize = (str) => {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-};
 
 const emit = defineEmits(['rollDice'])
 const handleButtonClick = (event) => {
@@ -48,6 +44,7 @@ const handleButtonClick = (event) => {
                     <span v-for="(subitem, subindex) in item.vulnerable" class="">{{ capitalize(subitem) }},</span>
                     <span class="">{{ item.note }};</span>
                 </span>
+                <span v-else-if="item.special" class="">{{ capitalize(item.special) }};</span>
                 <span v-else class="">{{ capitalize(item) }};</span>
             </span>
         </p>
@@ -60,6 +57,7 @@ const handleButtonClick = (event) => {
                     <span v-for="(subitem, subindex) in item.resist" class="">{{ capitalize(subitem) }},</span>
                     <span class="">{{ item.note }};</span>
                 </span>
+                <span v-else-if="item.special" class="">{{ capitalize(item.special) }};</span>
                 <span v-else class="">{{ capitalize(item) }};</span>
             </span>
         </p>
@@ -72,6 +70,7 @@ const handleButtonClick = (event) => {
                     <span v-for="(subitem, subindex) in item.immune" class="">{{ capitalize(subitem) }},</span>
                     <span class="">{{ item.note }};</span>
                 </span>
+                <span v-else-if="item.special" class="">{{ capitalize(item.special) }};</span>
                 <span v-else class="">{{ capitalize(item) }};</span>
             </span>
         </p>
@@ -86,6 +85,7 @@ const handleButtonClick = (event) => {
                     </span>
                     <span class="">{{ item.note }};</span>
                 </span>
+                <span v-else-if="item.special" class="">{{ capitalize(item.special) }};</span>
                 <span v-else class="">{{ capitalize(item) }};</span>
             </span>
         </p>

@@ -9,8 +9,10 @@ const { monster } = toRefs(props)
 
 const emit = defineEmits(['rollDice'])
 const handleButtonClick = (event) => {
-    console.log(event.target.innerText);
-    emit('rollDice', event.target.innerText);
+    if (event.target.id === 'rollButton') {
+        console.log(event.target.innerText);
+        emit('rollDice', event.target.innerText);
+    }
 };
 </script>
 
@@ -18,11 +20,11 @@ const handleButtonClick = (event) => {
     <div class="px-2 pt-2 space-y-2" @click="handleButtonClick">
         <!-- Traits -->
         <p v-for="item in monster.trait" class="w-full break-words space-x-1">
-            <span class="font-bold">{{ item.name }}</span>
+            <span v-html="parseText(item.name)" class="font-bold"></span>
         <p v-for="subitem in item.entries" class="w-full break-words space-x-1">
         <p v-if="subitem.items" class="space-y-2 ps-6">
         <p v-for="subsubitem in subitem.items" class="w-full break-words space-x-1">
-            <span class="font-semibold">{{ subsubitem.name }}:</span>
+            <span v-html="parseText(subsubitem.name)" class="font-semibold"></span>
             <span v-for="subsubsubitem in subsubitem.entries" v-html="parseText(subsubsubitem)"
                 class="w-full break-words space-x-1 "></span>
             <span v-html="parseText(subsubitem.entry)"></span>

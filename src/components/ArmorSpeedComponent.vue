@@ -1,6 +1,6 @@
 <script setup>
 import { ref, toRefs } from 'vue'
-import { extractItem } from '../parseFunctions';
+import { parseText } from '../parseFunctions';
 
 const props = defineProps({
     monster: Object
@@ -50,9 +50,13 @@ const isBoolean = (value) => {
                 <span v-if="ac_elem.ac" class="text-primary font-bold">{{ ac_elem.ac }}</span>
                 <span v-else class="text-primary font-bold">{{ ac_elem }}</span>
 
-                <span v-for="item in ac_elem.from" class="break-words space-x-1">({{ extractItem(item) }}),</span>
+                <span v-for="(item, index) in ac_elem.from" >
+                    <span v-html="parseText(item)" class="break-words space-x-1"></span>
+                    <span v-if="index < ac_elem.from.length - 1">,</span>
+                </span>
 
-                <span v-if="ac_elem.condition">{{ ac_elem.condition }};</span>
+                <span v-if="ac_elem.condition" v-html="parseText(ac_elem.condition)"></span>
+                <span>;</span>
             </span>
         </p>
         <!-- Hit points -->
