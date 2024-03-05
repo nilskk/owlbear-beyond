@@ -22,22 +22,18 @@ const searchInput = ref('');
 const fileInput = ref(null);
 const myModal = ref(null);
 const playerSelection = ref(null)
-
-const state = reactive({
-    // selectedMonster: bestiary.monster[0] || null
-    selectedMonster: null
-});
+const selectedMonster = ref(null);
 
 const bestiaryTable = ref([]);
 onMounted(async () => {
     bestiaryTable.value = await db.bestiary.toArray();
     if (bestiaryTable.value.length > 0) {
-        state.selectedMonster = bestiaryTable.value[0];
+        selectedMonster.value = bestiaryTable.value[0];
     }
 });
 
 const selectMonster = (monster) => {
-    state.selectedMonster = monster;
+    selectedMonster.value = monster;
 };
 
 const filteredMonsters = computed(() => {
@@ -84,7 +80,7 @@ function showMonsterSheet(item) {
     if (dndbeyond === lastCreature) return;
   
     lastCreature = dndbeyond;
-    state.selectedMonster = dndbeyond
+    selectedMonster.value = dndbeyond;
     
 }
 
@@ -128,7 +124,7 @@ const confirmTokenUpdate = () => {
                 console.log(items);
                 OBR.scene.items.updateItems(items, (items2) => {
                     for (let item of items2) {
-                        item.metadata[`${ID}/monstersheet`] = toRaw(state.selectedMonster);
+                        item.metadata[`${ID}/monstersheet`] = JSON.parse(JSON.stringify(selectedMonster.value))
                     }
                 });
             });
@@ -143,7 +139,7 @@ const confirmTokenUpdate = () => {
         <div class="modal-box">
             <div class="flex flex-col justify-center space-y-3">
                 <h1 v-if="playerSelection.metadata[`${ID}/monstersheet`]" class="text-xl font-bold">Current: {{ playerSelection.metadata[`${ID}/monstersheet`].name }}</h1>
-                <h1 class="text-xl font-bold">New: {{ state.selectedMonster.name }}</h1>
+                <h1 class="text-xl font-bold">New: {{ selectedMonster.name }}</h1>
                 <button @click="confirmTokenUpdate" class="btn btn-primary">Confirm</button>
             </div>
             
@@ -157,8 +153,8 @@ const confirmTokenUpdate = () => {
         <div class="drawer-content flex flex-col">
             <div class="navbar bg-base-300">
                 <div  class="flex-1 justify-start">
-                    <div v-if="state.selectedMonster" class="dropdown dropdown-begin" v-on-click-outside="clearInput">
-                        <input tabindex="0" type="search" class="input m-1" :placeholder="state.selectedMonster.name"
+                    <div v-if="selectedMonster" class="dropdown dropdown-begin" v-on-click-outside="clearInput">
+                        <input tabindex="0" type="search" class="input m-1" :placeholder="selectedMonster.name"
                             v-model="searchInput" @focus="$event.target.select()">
                         <ul tabindex="0"
                             class="dropdown-content menu p-2 shadow-2xl bg-base-100 rounded-box w-64 h-96 overflow-auto">
@@ -180,24 +176,24 @@ const confirmTokenUpdate = () => {
                     </label>
                 </div>
             </div>
-            <div v-if="state.selectedMonster">
-                <ArmorSpeedComponent :monster="state.selectedMonster" />
+            <div v-if="selectedMonster">
+                <ArmorSpeedComponent :monster="selectedMonster" />
                 <div class="divider divider-accent font-bold mb-0">Attributes</div>
-                <AttributesComponent :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)"/>
+                <AttributesComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)"/>
                 <div class="divider divider-accent font-bold mb-0">Skills</div>
-                <SkillsComponent :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="state.selectedMonster.trait" class="divider divider-accent font-bold mb-0">Traits</div>
-                <TraitsComponent v-if="state.selectedMonster.trait" :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="state.selectedMonster.spellcasting" class="divider divider-accent font-bold mb-0">Spells</div>
-                <SpellsComponent v-if="state.selectedMonster.spellcasting" :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="state.selectedMonster.action" class="divider divider-accent font-bold mb-0">Actions</div>
-                <ActionsComponent v-if="state.selectedMonster.action" :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="state.selectedMonster.bonus" class="divider divider-accent font-bold mb-0">Bonus Actions</div>
-                <BonusActionsComponent v-if="state.selectedMonster.bonus" :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="state.selectedMonster.reaction" class="divider divider-accent font-bold mb-0">Reactions</div>
-                <ReactionsComponent v-if="state.selectedMonster.reaction" :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="state.selectedMonster.legendary" class="divider divider-accent font-bold mb-0">Legendary Actions</div>
-                <LegendaryActionsComponent v-if="state.selectedMonster.legendary" :monster="state.selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <SkillsComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <div v-if="selectedMonster.trait" class="divider divider-accent font-bold mb-0">Traits</div>
+                <TraitsComponent v-if="selectedMonster.trait" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <div v-if="selectedMonster.spellcasting" class="divider divider-accent font-bold mb-0">Spells</div>
+                <SpellsComponent v-if="selectedMonster.spellcasting" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <div v-if="selectedMonster.action" class="divider divider-accent font-bold mb-0">Actions</div>
+                <ActionsComponent v-if="selectedMonster.action" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <div v-if="selectedMonster.bonus" class="divider divider-accent font-bold mb-0">Bonus Actions</div>
+                <BonusActionsComponent v-if="selectedMonster.bonus" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <div v-if="selectedMonster.reaction" class="divider divider-accent font-bold mb-0">Reactions</div>
+                <ReactionsComponent v-if="selectedMonster.reaction" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <div v-if="selectedMonster.legendary" class="divider divider-accent font-bold mb-0">Legendary Actions</div>
+                <LegendaryActionsComponent v-if="selectedMonster.legendary" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
             </div>
         </div>
         <div class="drawer-side">
