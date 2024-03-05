@@ -4,8 +4,8 @@
     "manifest_version": 1,
     "action": {
       "title": "Owlbear Beyond",
-      "icon": "/icon.svg",
-      "popover": "/",
+      "icon": "/owlbear-beyond/icon.svg",
+      "popover": "/owlbear-beyond/",
       "height": 800,
       "width": 600
     }
