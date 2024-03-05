@@ -142,7 +142,7 @@ const confirmTokenUpdate = () => {
     <dialog v-if="playerSelection" id="my_modal_2" class="modal" ref="myModal">
         <div class="modal-box">
             <div class="flex flex-col justify-center space-y-3">
-                <h1 class="text-xl font-bold">Current: {{ playerSelection.metadata[`${ID}/monstersheet`].name }}</h1>
+                <h1 v-if="playerSelection.metadata[`${ID}/monstersheet`]" class="text-xl font-bold">Current: {{ playerSelection.metadata[`${ID}/monstersheet`].name }}</h1>
                 <h1 class="text-xl font-bold">New: {{ state.selectedMonster.name }}</h1>
                 <button @click="confirmTokenUpdate" class="btn btn-primary">Confirm</button>
             </div>
@@ -167,7 +167,10 @@ const confirmTokenUpdate = () => {
                     </div>
                 </div>
                 <div class="flex-none">
-                    <button @click="updateTokens" v-if="playerSelection" class="btn btn-primary">Update Token</button>
+                    <button @click="updateTokens" v-if="playerSelection" class="btn btn-primary">
+                        <a v-if="playerSelection.metadata[`${ID}/monstersheet`]">Update Token</a>
+                        <a v-else>Link Token</a>
+                    </button>
                     <label for="my-drawer-1" class="drawer-button btn btn-square btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             class="inline-block w-5 h-5 stroke-current">
