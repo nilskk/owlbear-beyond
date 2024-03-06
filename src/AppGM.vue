@@ -8,7 +8,7 @@ import ActionsComponent from './components/ActionsComponent.vue';
 import BonusActionsComponent from './components/BonusActionsComponent.vue';
 import ReactionsComponent from './components/ReactionsComponent.vue';
 import LegendaryActionsComponent from './components/LegendaryActionsComponent.vue';
-import { ref, toRefs, reactive, computed, onMounted, onBeforeMount, onUpdated, toRaw } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { vOnClickOutside } from '@vueuse/components'
 import { db } from './db'
 import { writeBulkToTable, clearTable } from './dbFunctions'
@@ -16,6 +16,7 @@ import { rollDiceWithRumble } from './diceFunctions';
 import OBR from '@owlbear-rodeo/sdk';
 
 const ID = 'com.nilskk.owlbear-beyond';
+const CLASH_ID = 'com.battle-system.clash';
 const CLASH_LABEL_ID = '56d6b2c4-cd17-11ed-afa1-0242ac120002';
 
 const searchInput = ref('');
@@ -23,8 +24,8 @@ const fileInput = ref(null);
 const myModal = ref(null);
 const playerSelection = ref(null)
 const selectedMonster = ref(null);
-
 const bestiaryTable = ref([]);
+
 onMounted(async () => {
     bestiaryTable.value = await db.bestiary.toArray();
     if (bestiaryTable.value.length > 0) {
@@ -73,16 +74,7 @@ const deleteData = () => {
 
 let lastCreature = null;
 
-function showMonsterSheet(item) {
-    if (!item || !item.metadata[`${ID}/monstersheet`]) return;
-  
-    const dndbeyond = item.metadata[`${ID}/monstersheet`];
-    if (dndbeyond === lastCreature) return;
-  
-    lastCreature = dndbeyond;
-    selectedMonster.value = dndbeyond;
-    
-}
+
 
 function handlePlayerChange(player) {
     if(!player.selection) {
@@ -109,6 +101,17 @@ function handleClashLabelChange(items) {
     }); 
 }
 
+function showMonsterSheet(item) {
+    if (!item || !item.metadata[`${ID}/monstersheet`]) return;
+  
+    const dndbeyond = item.metadata[`${ID}/monstersheet`];
+    if (dndbeyond === lastCreature) return;
+  
+    lastCreature = dndbeyond;
+    selectedMonster.value = dndbeyond;
+    
+}
+
 OBR.player.onChange(handlePlayerChange);
 OBR.scene.local.onChange(handleClashLabelChange);
 
@@ -125,6 +128,16 @@ const confirmTokenUpdate = () => {
                 OBR.scene.items.updateItems(items, (items2) => {
                     for (let item of items2) {
                         item.metadata[`${ID}/monstersheet`] = JSON.parse(JSON.stringify(selectedMonster.value))
+                        if(Number.isInteger(selectedMonster.value.ac[0])) {
+                            item.metadata[`${CLASH_ID}/clash_armorClass`] = selectedMonster.value.ac[0];
+                        } else {
+                            item.metadata[`${CLASH_ID}/clash_armorClass`] = selectedMonster.value.ac[0].ac;
+                        }
+                        item.metadata[`${CLASH_ID}/clash_maxHP`] = selectedMonster.value.hp.average;
+                        item.metadata[`${CLASH_ID}/clash_currentHP`] = selectedMonster.value.hp.average;
+                        item.metadata[`${CLASH_ID}/clash_dexSave`] = Math.floor((selectedMonster.value.dex - 10) / 2);
+                        item.metadata[`${CLASH_ID}/clash_dexScore`] = selectedMonster.value.dex
+                        item.metadata[`${CLASH_ID}/clash`] = true
                     }
                 });
             });
