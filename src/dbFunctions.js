@@ -1,7 +1,8 @@
 import Dexie from 'dexie';
+import db from './db';
 
-function writeBulkToTable(data, table) {
-    table.bulkPut(data).then(function(lastKey) {
+function writeBulkToTable(data) {
+    db.bestiary.bulkPut(data).then(function(lastKey) {
         console.log("Done putting monster in indexeddb");
         console.log("Last monsters name and source was: " + lastKey);
     }).catch(Dexie.BulkError, function (e) {
@@ -12,8 +13,8 @@ function writeBulkToTable(data, table) {
     });
 }
 
-function clearTable(table) {
-    table.clear().then(function() {
+function clearTable() {
+    db.bestiary.clear().then(function() {
         console.log("Cleared the table");
     });
 }

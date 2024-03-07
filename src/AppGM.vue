@@ -62,14 +62,14 @@ const saveJson = () => {
     reader.onload = (e) => {
       const json = JSON.parse(e.target.result);
       const monster_list = json.monster;
-      writeBulkToTable(monster_list, db.bestiary);
+      writeBulkToTable(monster_list);
     };
     reader.readAsText(file);
   }
 };
 
 const deleteData = () => {
-    clearTable(db.bestiary);
+    clearTable();
 };
 
 let lastCreature = null;
@@ -190,23 +190,32 @@ const confirmTokenUpdate = () => {
                 </div>
             </div>
             <div v-if="selectedMonster">
-                <ArmorSpeedComponent :monster="selectedMonster" />
-                <div class="divider divider-accent font-bold mb-0">Attributes</div>
-                <AttributesComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)"/>
-                <div class="divider divider-accent font-bold mb-0">Skills</div>
-                <SkillsComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="selectedMonster.trait" class="divider divider-accent font-bold mb-0">Traits</div>
-                <TraitsComponent v-if="selectedMonster.trait" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="selectedMonster.spellcasting" class="divider divider-accent font-bold mb-0">Spells</div>
-                <SpellsComponent v-if="selectedMonster.spellcasting" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="selectedMonster.action" class="divider divider-accent font-bold mb-0">Actions</div>
-                <ActionsComponent v-if="selectedMonster.action" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="selectedMonster.bonus" class="divider divider-accent font-bold mb-0">Bonus Actions</div>
-                <BonusActionsComponent v-if="selectedMonster.bonus" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="selectedMonster.reaction" class="divider divider-accent font-bold mb-0">Reactions</div>
-                <ReactionsComponent v-if="selectedMonster.reaction" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
-                <div v-if="selectedMonster.legendary" class="divider divider-accent font-bold mb-0">Legendary Actions</div>
-                <LegendaryActionsComponent v-if="selectedMonster.legendary" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                <div v-if="selectedMonster._copy">
+                    <div class="flex items-center justify-center h-screen">
+                        <p class="text-primary text-5xl font-bold">
+                            Creature can't be shown, because it is dependent on other creatures. Use 5e.tools to get the full creature.
+                        </p>
+                    </div>
+                </div>
+                <div v-else>
+                    <ArmorSpeedComponent :monster="selectedMonster" />
+                    <div class="divider divider-accent font-bold mb-0">Attributes</div>
+                    <AttributesComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)"/>
+                    <div class="divider divider-accent font-bold mb-0">Skills</div>
+                    <SkillsComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <div v-if="selectedMonster.trait" class="divider divider-accent font-bold mb-0">Traits</div>
+                    <TraitsComponent v-if="selectedMonster.trait" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <div v-if="selectedMonster.spellcasting" class="divider divider-accent font-bold mb-0">Spells</div>
+                    <SpellsComponent v-if="selectedMonster.spellcasting" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <div v-if="selectedMonster.action" class="divider divider-accent font-bold mb-0">Actions</div>
+                    <ActionsComponent v-if="selectedMonster.action" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <div v-if="selectedMonster.bonus" class="divider divider-accent font-bold mb-0">Bonus Actions</div>
+                    <BonusActionsComponent v-if="selectedMonster.bonus" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <div v-if="selectedMonster.reaction" class="divider divider-accent font-bold mb-0">Reactions</div>
+                    <ReactionsComponent v-if="selectedMonster.reaction" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <div v-if="selectedMonster.legendary" class="divider divider-accent font-bold mb-0">Legendary Actions</div>
+                    <LegendaryActionsComponent v-if="selectedMonster.legendary" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                </div>
             </div>
         </div>
         <div class="drawer-side">
