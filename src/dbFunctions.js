@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import db from './db';
+import { db } from './db';
 
 function writeBulkToTable(data) {
     db.bestiary.bulkPut(data).then(function(lastKey) {
