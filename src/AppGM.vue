@@ -191,11 +191,9 @@ const confirmTokenUpdate = () => {
             </div>
             <div v-if="selectedMonster">
                 <div v-if="selectedMonster._copy">
-                    <div class="flex items-center justify-center h-screen">
-                        <p class="text-primary text-5xl font-bold">
-                            Creature can't be shown, because it is dependent on other creatures. Use 5e.tools to get the full creature.
-                        </p>
-                    </div>
+                    <p class="text-primary text-5xl font-bold">
+                        Creature can't be shown, because it is dependent on other creatures. Use 5e.tools to get the full creature.
+                    </p>
                 </div>
                 <div v-else>
                     <ArmorSpeedComponent :monster="selectedMonster" />
