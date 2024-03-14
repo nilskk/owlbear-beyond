@@ -137,7 +137,6 @@ const confirmTokenUpdate = () => {
                         item.metadata[`${CLASH_ID}/clash_currentHP`] = selectedMonster.value.hp.average;
                         item.metadata[`${CLASH_ID}/clash_dexSave`] = Math.floor((selectedMonster.value.dex - 10) / 2);
                         item.metadata[`${CLASH_ID}/clash_dexScore`] = selectedMonster.value.dex
-                        item.metadata[`${CLASH_ID}/clash`] = true
                     }
                 });
             });
