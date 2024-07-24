@@ -138,6 +138,7 @@ const confirmTokenUpdate = () => {
                         item.metadata[`${CLASH_ID}/clash_dexSave`] = Math.floor((selectedMonster.value.dex - 10) / 2);
                         item.metadata[`${CLASH_ID}/clash_dexScore`] = selectedMonster.value.dex
                         item.metadata[`${CLASH_ID}/clash_initiative`] = 10 + Math.floor((selectedMonster.value.dex - 10) / 2);
+                        item.metadata[`${CLASH_ID}/clash_unitName`] = selectedMonster.value.name;
                         // Set Clash ID to have a the metadata applied directly
                         item.metadata[`${CLASH_ID}/clash_id`] = item.id;
                     }
