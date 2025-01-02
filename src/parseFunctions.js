@@ -4,10 +4,11 @@ function capitalize(value) {
     return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 };
 
-function handlePipe(value) {
+function handlePipe(value, mode="first") {
   if (value.includes('|')) {
     const parts = value.split('|');
-    return parts[0];
+    if (mode === 'first') return parts[0];
+    if (mode === 'last') return parts[parts.length - 1];
   }
   return value;
 }
@@ -16,11 +17,12 @@ function parseText(value) {
   if (!value) return value;
 
   value = value.replaceAll('{@h}', '')
+  value = value.replaceAll('{@actSaveFail}', '{@actSaveFail 1}')
+  value = value.replaceAll('{@actSaveSuccess}', '{@actSaveSuccess 1}')
 
   value = value.replace(/{@([^ ]+)( ([^}]+))?}/g, function(match, tagName, _, tagValue) {
     if (tagValue) {
       tagValue = tagValue.trim();
-      tagValue = handlePipe(tagValue);
     }
     switch (tagName) {
       case 'dice':
@@ -90,40 +92,25 @@ function convertDC(value) {
 }
 
 function convertCreature(value) {
-  let displayValue = value;
-  let linkValue = value;
-  
-  if (value.includes('|')) {
-    const parts = value.split('|');
-    linkValue = parts[0];
-    displayValue = parts[parts.length - 1];
-  }
+  let displayValue = handlePipe(value, 'last');
+  let linkValue = handlePipe(value, 'first');
   linkValue = linkValue.replace(/[^a-zA-Z\s]/g, '').replace(/\s+/g, '-');
   return `<a href="https://www.dndbeyond.com/search?q=${linkValue}&f=monsters&c=monsters" target="_blank" class="link link-primary">${displayValue}</a>`;
 }
 
 function convertStatus(value) {
-  let displayValue = value;
-  
-  if (value.includes('|')) {
-    const parts = value.split('|');
-    displayValue = parts[parts.length - 1];
-  }
+  let displayValue = handlePipe(value, 'last');
   return `<span class="text-primary">${displayValue}</span>`;
 }
 
 function convertCondition(value) {
+  value = handlePipe(value);
   const linkValue = capitalize(value.replace(/[^a-zA-Z\s]/g, '').replace(/\s+/g, '-'));
   return `<a href="https://www.dndbeyond.com/sources/dnd/free-rules/rules-glossary#${linkValue}Condition" target="_blank" class="link link-primary">${value}</a>`;
 }
 
 function convertItem(value) {
-  let displayValue = value;
-  
-  if (value.includes('|')) {
-    const parts = value.split('|');
-    displayValue = parts[0];
-  }
+  let displayValue = handlePipe(value);
   return `<span class="text-primary">${displayValue}</span>`;
 }
 
@@ -137,12 +124,7 @@ function convertSkill(value) {
 }
 
 function convertQuickRef(value) {
-  let displayValue = value;
-  
-  if (value.includes('|')) {
-    const parts = value.split('|');
-    displayValue = parts[0];
-  }
+  let displayValue = handlePipe(value);
   return `<span class="text-primary">${displayValue}</span>`;
 }
 
@@ -172,22 +154,12 @@ function convertRecharge(value) {
 }
 
 function convertAction(value) {
-  let displayValue = value;
-  
-  if (value.includes('|')) {
-    const parts = value.split('|');
-    displayValue = parts[parts.length - 1];
-  }
+  let displayValue = handlePipe(value, 'last');
   return `<span class="text-primary">${displayValue}</span>`;
 }
 
 function convertFilter(value) {
-  let displayValue = value;
-  
-  if (value.includes('|')) {
-    const parts = value.split('|');
-    displayValue = parts[0];
-  }
+  let displayValue = handlePipe(value);
   return `<span class="text-primary">${displayValue}</span>`;
 }
 
