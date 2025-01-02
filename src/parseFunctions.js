@@ -4,6 +4,14 @@ function capitalize(value) {
     return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 };
 
+function handlePipe(value) {
+  if (value.includes('|')) {
+    const parts = value.split('|');
+    return parts[0];
+  }
+  return value;
+}
+
 function parseText(value) {
   if (!value) return value;
 
@@ -12,6 +20,7 @@ function parseText(value) {
   value = value.replace(/{@([^ ]+)( ([^}]+))?}/g, function(match, tagName, _, tagValue) {
     if (tagValue) {
       tagValue = tagValue.trim();
+      tagValue = handlePipe(tagValue);
     }
     switch (tagName) {
       case 'dice':
@@ -24,6 +33,8 @@ function parseText(value) {
         return convertSpell(tagValue);
       case 'atk':
         return convertAtk(tagValue);
+      case 'atkr':
+        return convertAtkRoll(tagValue);
       case 'hit':
         return convertHit(tagValue);
       case 'creature':
@@ -44,6 +55,12 @@ function parseText(value) {
         return convertAction(tagValue);
       case 'filter':
         return convertFilter(tagValue);
+      case 'actSave':
+        return convertSave(tagValue);
+      case 'actSaveFail':
+        return convertSaveFail();
+      case 'actSaveSuccess':
+        return convertSaveSuccess();
       default:
         return match; // if no matching tag, return the original string
     }
@@ -82,7 +99,7 @@ function convertCreature(value) {
     displayValue = parts[parts.length - 1];
   }
   linkValue = linkValue.replace(/[^a-zA-Z\s]/g, '').replace(/\s+/g, '-');
-  return `<a href="https://www.dndbeyond.com/monsters/${linkValue}" target="_blank" class="link link-primary">${displayValue}</a>`;
+  return `<a href="https://www.dndbeyond.com/search?q=${linkValue}&f=monsters&c=monsters" target="_blank" class="link link-primary">${displayValue}</a>`;
 }
 
 function convertStatus(value) {
@@ -97,7 +114,7 @@ function convertStatus(value) {
 
 function convertCondition(value) {
   const linkValue = capitalize(value.replace(/[^a-zA-Z\s]/g, '').replace(/\s+/g, '-'));
-  return `<a href="https://www.dndbeyond.com/sources/basic-rules/appendix-a-conditions#${linkValue}" target="_blank" class="link link-primary">${value}</a>`;
+  return `<a href="https://www.dndbeyond.com/sources/dnd/free-rules/rules-glossary#${linkValue}Condition" target="_blank" class="link link-primary">${value}</a>`;
 }
 
 function convertItem(value) {
@@ -112,7 +129,7 @@ function convertItem(value) {
 
 function convertSpell(value) {
   const linkValue = value.replace(/[^a-zA-Z\s]/g, '').replace(/\s+/g, '-');
-  return `<a href="https://www.dndbeyond.com/spells/${linkValue}" target="_blank" class="link link-primary">${value}</a>`;
+  return `<a href="https://www.dndbeyond.com/search?q=${linkValue}&f=spells&c=spells" target="_blank" class="link link-primary">${value}</a>`;
 }
 
 function convertSkill(value) {
@@ -135,6 +152,14 @@ function convertAtk(value) {
   .replace('rw', 'Ranged Weapon')
   .replace('ms', 'Meele Spell')
   .replace('rs', 'Ranged Spell')
+  .replace(',', ', ');
+  return `<span class="text-primary">${displayValue}:</span>`;
+}
+
+function convertAtkRoll(value) {
+  const displayValue = value
+  .replace('m', 'Melee Attack Roll')
+  .replace('r', 'Ranged Attack Roll')
   .replace(',', ', ');
   return `<span class="text-primary">${displayValue}:</span>`;
 }
@@ -166,7 +191,23 @@ function convertFilter(value) {
   return `<span class="text-primary">${displayValue}</span>`;
 }
 
+function convertSave(value) {
+  const displayValue = value
+  .replace('str', 'Strength')
+  .replace('dex', 'Dexterity')
+  .replace('con', 'Constitution')
+  .replace('int', 'Intelligence')
+  .replace('wis', 'Wisdom')
+  .replace('cha', 'Charisma');
+  return `<span class="text-primary">${displayValue} Saving Throw:</span>`;
+}
 
+function convertSaveFail() {
+  return `<span class="text-primary">Failure:</span>`;
+}
 
+function convertSaveSuccess() {
+  return `<span class="text-primary">Success:</span>`;
+}
 
 export { parseText, capitalize };
