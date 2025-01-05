@@ -167,7 +167,7 @@ const confirmTokenUpdate = () => {
     <div class="drawer drawer-end">
         <input id="my-drawer-1" type="checkbox" class="drawer-toggle" /> 
         <div class="drawer-content flex flex-col">
-            <div class="navbar bg-base-300">
+            <div class="navbar bg-base-300 z-50">
                 <div  class="flex-1 justify-start">
                     <div v-if="selectedMonster" class="dropdown dropdown-begin" v-on-click-outside="clearInput">
                         <input tabindex="0" type="search" class="input m-1" :placeholder="selectedMonster.name"
@@ -201,21 +201,21 @@ const confirmTokenUpdate = () => {
                 <div v-else>
                     <ArmorSpeedComponent :monster="selectedMonster" />
                     <div class="divider divider-accent font-bold mb-0">Attributes</div>
-                    <AttributesComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)"/>
+                    <AttributesComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)"/>
                     <div class="divider divider-accent font-bold mb-0">Skills</div>
-                    <SkillsComponent :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <SkillsComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                     <div v-if="selectedMonster.trait" class="divider divider-accent font-bold mb-0">Traits</div>
-                    <TraitsComponent v-if="selectedMonster.trait" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <TraitsComponent v-if="selectedMonster.trait" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                     <div v-if="selectedMonster.spellcasting" class="divider divider-accent font-bold mb-0">Spells</div>
-                    <SpellsComponent v-if="selectedMonster.spellcasting" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <SpellsComponent v-if="selectedMonster.spellcasting" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                     <div v-if="selectedMonster.action" class="divider divider-accent font-bold mb-0">Actions</div>
-                    <ActionsComponent v-if="selectedMonster.action" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <ActionsComponent v-if="selectedMonster.action" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                     <div v-if="selectedMonster.bonus" class="divider divider-accent font-bold mb-0">Bonus Actions</div>
-                    <BonusActionsComponent v-if="selectedMonster.bonus" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <BonusActionsComponent v-if="selectedMonster.bonus" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                     <div v-if="selectedMonster.reaction" class="divider divider-accent font-bold mb-0">Reactions</div>
-                    <ReactionsComponent v-if="selectedMonster.reaction" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <ReactionsComponent v-if="selectedMonster.reaction" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                     <div v-if="selectedMonster.legendary" class="divider divider-accent font-bold mb-0">Legendary Actions</div>
-                    <LegendaryActionsComponent v-if="selectedMonster.legendary" :monster="selectedMonster" @rollDice="(value) => rollDiceWithRumble(value)" />
+                    <LegendaryActionsComponent v-if="selectedMonster.legendary" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                 </div>
             </div>
         </div>

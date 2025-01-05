@@ -1,6 +1,7 @@
 <script setup>
 import { ref, toRefs } from 'vue'
 import { capitalize } from '../parseFunctions';
+import { useRollButtonListeners } from '../composables/useRollButtonListeners';
 
 const props = defineProps({
     monster: Object
@@ -8,30 +9,18 @@ const props = defineProps({
 const {monster} = toRefs(props)
 
 const emit = defineEmits(['rollDice'])
-const handleButtonClick = (event) => {
-    console.log(event.target.innerText);
-    emit('rollDice', event.target.innerText);
-};
+useRollButtonListeners(emit)
+
 </script>
 
 <template>
     <div class="px-2 pt-2 space-y-2">
-        <!-- Saving Throws -->
-        <p v-if="monster.save" class="w-full break-words space-x-1">
-            <span class="font-bold">Saving</span>
-            <span class="font-bold">Throws:</span>
-            <span v-for="(item, key) in monster.save" class="break-words space-x-1">
-                <span class="">{{ key.toUpperCase() }}</span>
-                <button class="btn btn-xs btn-outline btn-secondary font-bold" @click="handleButtonClick">{{ item }}</button>
-                <span class="">,</span>
-            </span>
-        </p>
         <!-- Skills -->
         <p v-if="monster.skill" class="w-full break-words space-x-1">
             <span class="font-bold">Skills:</span>
             <span v-for="(item, key) in monster.skill" class="break-words space-x-1">
                 <span class="">{{ capitalize(key) }}</span>
-                <button class="btn btn-xs btn-outline btn-secondary font-bold" @click="handleButtonClick">{{ item }}</button>
+                <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton">{{ item }}</button>
                 <span class="">,</span>
             </span>
         </p>

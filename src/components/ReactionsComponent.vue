@@ -1,6 +1,7 @@
 <script setup>
 import { ref, toRefs } from 'vue'
 import { parseText } from '../parseFunctions';
+import { useRollButtonListeners } from '../composables/useRollButtonListeners';
 
 const props = defineProps({
     monster: Object
@@ -8,16 +9,12 @@ const props = defineProps({
 const { monster } = toRefs(props)
 
 const emit = defineEmits(['rollDice'])
-const handleButtonClick = (event) => {
-    if (event.target.id === 'rollButton') {
-        console.log(event.target.innerText);
-        emit('rollDice', event.target.innerText);
-    }
-};
+useRollButtonListeners(emit)
+
 </script>
 
 <template>
-    <div class="px-2 pt-2 space-y-2" @click="handleButtonClick">
+    <div class="px-2 pt-2 space-y-2">
         <!-- Reactions -->
         <p v-for="item in monster.reaction" class="w-full break-words space-x-1">
             <span v-html="parseText(item.name)" class="font-bold"></span>
