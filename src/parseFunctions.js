@@ -115,6 +115,7 @@ function convertItem(value) {
 }
 
 function convertSpell(value) {
+    value = handlePipe(value);
     const linkValue = value.replace(/[^a-zA-Z\s]/g, '').replace(/\s+/g, '-');
     return `<a href="https://www.dndbeyond.com/search?q=${linkValue}&f=spells&c=spells" target="_blank" class="link link-primary">${value}</a>`;
 }
