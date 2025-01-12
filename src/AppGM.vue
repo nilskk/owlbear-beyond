@@ -24,12 +24,19 @@ const fileInput = ref(null);
 const myModal = ref(null);
 const playerSelection = ref(null)
 const selectedMonster = ref(null);
-const bestiaryTable = ref([]);
+const groupedBestiary = ref({});
 
 onMounted(async () => {
-    bestiaryTable.value = await db.bestiary.toArray();
-    if (bestiaryTable.value.length > 0) {
-        selectedMonster.value = bestiaryTable.value[0];
+    const bestiary = await db.bestiary.toArray();
+    groupedBestiary.value = bestiary.reduce((acc, monster) => {
+        if (!acc[monster.source]) {
+            acc[monster.source] = [];
+        }
+        acc[monster.source].push(monster);
+        return acc;
+    }, {});
+    if (bestiary.length > 0) {
+        selectedMonster.value = bestiary[0];
     }
 });
 
@@ -37,17 +44,17 @@ const selectMonster = (monster) => {
     selectedMonster.value = monster;
 };
 
-const filteredMonsters = computed(() => {
+const filteredGroupedBestiary = computed(() => {
     if (!searchInput.value) {
-        // return bestiary.monster;
-        return bestiaryTable.value;
+        return groupedBestiary.value;
     }
-    // return bestiary.monster.filter(monster =>
-    //     monster.name.toLowerCase().includes(searchInput.value.toLowerCase())
-    // );
-    return bestiaryTable.value.filter(monster =>
-        monster.name.toLowerCase().includes(searchInput.value.toLowerCase())
-    );
+    const filtered = {};
+    for (const source in groupedBestiary.value) {
+        filtered[source] = groupedBestiary.value[source].filter(monster =>
+            monster.name.toLowerCase().includes(searchInput.value.toLowerCase())
+        );
+    }
+    return filtered;
 });
 
 const clearInput = () => {
@@ -167,14 +174,26 @@ const confirmTokenUpdate = () => {
     <div class="drawer drawer-end">
         <input id="my-drawer-1" type="checkbox" class="drawer-toggle" /> 
         <div class="drawer-content flex flex-col">
-            <div class="navbar bg-base-300 z-50">
+            <div class="navbar bg-base-300">
                 <div  class="flex-1 justify-start">
-                    <div v-if="selectedMonster" class="dropdown dropdown-begin" v-on-click-outside="clearInput">
+                    <div v-if="selectedMonster" class="dropdown dropdown-begin z-50" v-on-click-outside="clearInput">
                         <input tabindex="0" type="search" class="input m-1" :placeholder="selectedMonster.name"
                             v-model="searchInput" @focus="$event.target.select()">
                         <ul tabindex="0"
-                            class="dropdown-content menu p-2 shadow-2xl bg-base-100 rounded-box w-64 h-96 overflow-auto">
-                            <li><a v-for="item in filteredMonsters" @click="selectMonster(item)">{{ item.name }}</a></li>
+                            class="dropdown-content menu menu-vertical p-2 shadow-2xl bg-base-100 rounded-box">
+                            <div className="overflow-y-auto max-h-96 w-64">
+                                <li v-for="(monsters, source) in filteredGroupedBestiary" :key="source">
+                                    <details open>
+                                        <summary>{{ source }}</summary>
+                                        <ul>
+                                            <li v-for="monster in monsters" :key="monster.name">
+                                                <a @click="selectMonster(monster)">{{ monster.name }}</a>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                    
+                                </li>
+                            </div>
                         </ul>
                     </div>
                 </div>
@@ -236,4 +255,6 @@ const confirmTokenUpdate = () => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>
