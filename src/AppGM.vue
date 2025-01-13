@@ -13,6 +13,7 @@ import { vOnClickOutside } from '@vueuse/components'
 import { db } from './db'
 import { writeBulkToTable, clearTable } from './dbFunctions'
 import { rollDiceWithRumble } from './diceFunctions';
+import { parseSpecialHp, parseSpecialAc } from './parseFunctions';
 import OBR from '@owlbear-rodeo/sdk';
 
 const ID = 'com.nilskk.owlbear-beyond';
@@ -81,8 +82,6 @@ const deleteData = () => {
 
 let lastCreature = null;
 
-
-
 function handlePlayerChange(player) {
     if(!player.selection) {
         playerSelection.value = null;
@@ -137,11 +136,15 @@ const confirmTokenUpdate = () => {
                         item.metadata[`${ID}/monstersheet`] = JSON.parse(JSON.stringify(selectedMonster.value))
                         if(Number.isInteger(selectedMonster.value.ac[0])) {
                             item.metadata[`${CLASH_ID}/clash_armorClass`] = selectedMonster.value.ac[0];
-                        } else {
+                        } 
+                        else if (selectedMonster.value.ac[0].ac) {
                             item.metadata[`${CLASH_ID}/clash_armorClass`] = selectedMonster.value.ac[0].ac;
                         }
-                        item.metadata[`${CLASH_ID}/clash_maxHP`] = selectedMonster.value.hp.average;
-                        item.metadata[`${CLASH_ID}/clash_currentHP`] = selectedMonster.value.hp.average;
+                        else if (selectedMonster.value.ac[0].special) {
+                            item.metadata[`${CLASH_ID}/clash_armorClass`] = parseSpecialAc(selectedMonster.value.ac[0].special);
+                        }
+                        item.metadata[`${CLASH_ID}/clash_maxHP`] = selectedMonster.value.hp.average || parseSpecialHp(selectedMonster.value.hp.special);
+                        item.metadata[`${CLASH_ID}/clash_currentHP`] = selectedMonster.value.hp.average || parseSpecialHp(selectedMonster.value.hp.special);
                         item.metadata[`${CLASH_ID}/clash_dexSave`] = Math.floor((selectedMonster.value.dex - 10) / 2);
                         item.metadata[`${CLASH_ID}/clash_dexScore`] = selectedMonster.value.dex
                         item.metadata[`${CLASH_ID}/clash_initiative`] = 10 + Math.floor((selectedMonster.value.dex - 10) / 2);

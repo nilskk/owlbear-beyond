@@ -13,6 +13,22 @@ function handlePipe(value, mode="first") {
     return value;
 }
 
+function parseSpecialHp(value) {
+    if (typeof value === 'string') {
+        const match = value.match(/\d+/);
+        return match ? parseInt(match[0], 10) : value;
+    }
+    return value;
+}
+
+function parseSpecialAc(value) {
+    if (typeof value === 'string') {
+        const match = value.match(/\d+/);
+        return match ? parseInt(match[0], 10) : value;
+    }
+    return value;
+}
+
 function parseText(value) {
     if (!value) return value;
 
@@ -21,55 +37,62 @@ function parseText(value) {
     value = value.replaceAll('{@actSaveSuccess}', '{@actSaveSuccess 1}')
 
     value = value.replace(/{@([^ ]+)( ([^}]+))?}/g, function(match, tagName, _, tagValue) {
-    if (tagValue) {
-        tagValue = tagValue.trim();
-    }
-    switch (tagName) {
-        case 'dice':
-            return convertDice(tagValue);
-        case 'damage':
-            return convertDamage(tagValue);
-        case 'item':
-            return convertItem(tagValue);
-        case 'spell':
-            return convertSpell(tagValue);
-        case 'atk':
-            return convertAtk(tagValue);
-        case 'atkr':
-            return convertAtkRoll(tagValue);
-        case 'hit':
-            return convertHit(tagValue);
-        case 'creature':
-            return convertCreature(tagValue);
-        case 'status':
-            return convertStatus(tagValue);
-        case 'condition':
-            return convertCondition(tagValue);
-        case 'dc':
-            return convertDC(tagValue);
-        case 'skill':
-            return convertSkill(tagValue);
-        case 'quickref':
-            return convertQuickRef(tagValue);
-        case 'recharge':
-            return convertRecharge(tagValue);
-        case 'action':
-            return convertAction(tagValue);
-        case 'filter':
-            return convertFilter(tagValue);
-        case 'actSave':
-            return convertSave(tagValue);
-        case 'actSaveFail':
-            return convertSaveFail();
-        case 'actSaveSuccess':
-            return convertSaveSuccess();
-        default:
-            return match; // if no matching tag, return the original string
-    }
-  });
+        if (tagValue) {
+            tagValue = tagValue.trim();
+        }
+        switch (tagName) {
+            case 'dice':
+                return convertDice(tagValue);
+            case 'damage':
+                return convertDamage(tagValue);
+            case 'item':
+                return convertItem(tagValue);
+            case 'spell':
+                return convertSpell(tagValue);
+            case 'atk':
+                return convertAtk(tagValue);
+            case 'atkr':
+                return convertAtkRoll(tagValue);
+            case 'hit':
+                return convertHit(tagValue);
+            case 'creature':
+                return convertCreature(tagValue);
+            case 'status':
+                return convertStatus(tagValue);
+            case 'condition':
+                return convertCondition(tagValue);
+            case 'dc':
+                return convertDC(tagValue);
+            case 'skill':
+                return convertSkill(tagValue);
+            case 'quickref':
+                return convertQuickRef(tagValue);
+            case 'recharge':
+                return convertRecharge(tagValue);
+            case 'action':
+                return convertAction(tagValue);
+            case 'filter':
+                return convertFilter(tagValue);
+            case 'actSave':
+                return convertSave(tagValue);
+            case 'actSaveFail':
+                return convertSaveFail();
+            case 'actSaveSuccess':
+                return convertSaveSuccess();
+            case 'hitYourSpellAttack':
+                return convertToPrimaryText(tagValue);
+            default:
+                return match; // if no matching tag, return the original string
+        }
+    });
 
-  return value;
+    return value;
 
+}
+
+function convertToPrimaryText(value) {
+    let displayValue = handlePipe(value);
+    return `<span class="text-primary">${displayValue}</span>`;
 }
 
 function convertDice(value) {
@@ -183,4 +206,4 @@ function convertSaveSuccess() {
     return `<span class="text-primary">Success:</span>`;
 }
 
-export { parseText, capitalize };
+export { parseText, capitalize, parseSpecialHp, parseSpecialAc };

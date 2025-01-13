@@ -15,32 +15,6 @@ const isBoolean = (value) => {
 </script>
 
 <template>
-    <!-- <div class="stats shadow-xl flex">
-        <div class="stat" v-for="ac_elem in monster.ac">
-            <div class="stat-title">Armor Class</div>
-            <div class="stat-desc">
-                <div v-if="ac_elem.from">{{ac_elem.from[0]}}</div>
-                <div v-else>-</div>
-            </div>
-            <div class="stat-value text-primary text-2xl">{{ac_elem.ac}}</div>
-            <div class="stat-desc">
-                <div v-if="ac_elem.condition">{{ac_elem.condition}}</div>
-                <div v-else>-</div>
-            </div>    
-        </div>
-        <div class="stat" v-for="(item, key ) in monster.speed">
-            <div class="stat-title">Speed</div>
-            <div class="stat-desc">{{key}}</div>
-            <div class="stat-value text-primary text-2xl">
-                <div v-if="item.number">{{item.number}} ft.</div>
-                <div v-else>{{item}} ft.</div>
-            </div>
-            <div class="stat-desc">
-                <div v-if="item.number">{{item.condition}}</div>
-                <div v-else>-</div>
-            </div>
-        </div>
-    </div> -->
     <!-- Armor -->
     <div class="px-2">
         <p class="w-full break-words space-x-1">
@@ -48,6 +22,7 @@ const isBoolean = (value) => {
             <span class="font-bold">Class:</span>
             <span v-for="ac_elem in monster.ac" class="break-words space-x-1">
                 <span v-if="ac_elem.ac" class="text-primary font-bold">{{ ac_elem.ac }}</span>
+                <span v-else-if="ac_elem.special" class="text-primary font-bold">{{ ac_elem.special }}</span>
                 <span v-else class="text-primary font-bold">{{ ac_elem }}</span>
 
                 <span v-for="(item, index) in ac_elem.from" >
@@ -63,8 +38,9 @@ const isBoolean = (value) => {
         <p class="w-full break-words space-x-1">
             <span class="font-bold">Hit</span>
             <span class="font-bold">Points:</span>
-            <span class="text-primary font-bold">{{ monster.hp.average }}</span>
-            <span class="">({{ monster.hp.formula }})</span>
+            <span v-if="monster.hp.average" class="text-primary font-bold">{{ monster.hp.average }}</span>
+            <span v-if="monster.hp.formula" class="">({{ monster.hp.formula }})</span>
+            <span v-if="monster.hp.special" class="text-primary font-bold">{{ monster.hp.special }}</span>
         </p>
         <!-- Speed -->
         <p class="w-full break-words space-x-1">
