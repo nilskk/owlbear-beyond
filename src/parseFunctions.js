@@ -97,17 +97,17 @@ function convertToPrimaryText(value) {
 
 function convertDice(value) {
     const displayValue = value
-    return `<button id="rollButton" class="btn btn-xs btn-outline btn-secondary font-bold rollButton">${displayValue}</button>`;
+    return `<button class="btn btn-xs btn-outline btn-secondary font-bold rollButton">${displayValue}</button>`;
 }
 
 function convertDamage(value) {
     const displayValue = value
-    return `<button id="rollButton" class="btn btn-xs btn-outline btn-secondary font-bold rollButton">${displayValue}</button>`;
+    return `<button class="btn btn-xs btn-outline btn-secondary font-bold rollButton">${displayValue}</button>`;
 }
 
 function convertHit(value) {
     const displayValue = value >= 0 ? `+${value}` : value;
-    return `<button id="rollButton" class="btn btn-xs btn-outline btn-secondary font-bold rollButton">${displayValue}</button>`;
+    return `<button class="btn btn-xs btn-outline btn-secondary font-bold rollButton">${displayValue}</button>`;
 }
 
 function convertDC(value) {
