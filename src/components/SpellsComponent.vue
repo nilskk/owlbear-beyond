@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, toRefs, onUpdated, nextTick } from 'vue'
+import { onMounted, ref, toRefs, onUpdated, nextTick, computed } from 'vue'
 import { parseText } from '../parseFunctions';
 import { useRollButtonListeners } from '../composables/useRollButtonListeners';
 
@@ -7,9 +7,12 @@ import { useRollButtonListeners } from '../composables/useRollButtonListeners';
 const props = defineProps({
     monster: Object
 })
-const { monster } = toRefs(props)
 
 const emit = defineEmits(['rollDice'])
+
+const spellsWithoutDisplayAs = computed(() => {
+    return props.monster.spellcasting ? props.monster.spellcasting.filter(item => !('displayAs' in item)) : [];
+});
 
 const attachListeners = async () => {
     await nextTick();
@@ -48,7 +51,7 @@ onUpdated(attachListeners);
 <template>
     <div class="px-2 pt-2 space-y-2">
         <!-- Spells -->
-        <p v-for="(item, index) in monster.spellcasting" class="w-full break-words space-x-1 space-y-2">
+        <p v-for="(item, index) in spellsWithoutDisplayAs" class="w-full break-words space-x-1 space-y-2">
             <span v-html="parseText(item.name)" class="font-bold"></span>
             <span v-for="header in item.headerEntries" v-html="parseText(header)" class="w-full break-words space-x-1"></span>
             <p v-if="item.will" class="w-full break-words space-x-1">
@@ -123,7 +126,7 @@ onUpdated(attachListeners);
                 </span>
             </p>
             <p v-for="header in item.footerEntries" v-html="parseText(header)" class="w-full break-words space-x-1"></p>
-            <div v-if="index < monster.spellcasting.length - 1" class="divider mb-0"></div>
+            <div v-if="index < props.monster.spellcasting.length - 1" class="divider mb-0"></div>
         </p>
     </div>
 </template>

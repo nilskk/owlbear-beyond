@@ -226,18 +226,11 @@ const confirmTokenUpdate = () => {
                     <AttributesComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)"/>
                     <div class="divider divider-accent font-bold mb-0">Skills</div>
                     <SkillsComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
-                    <div v-if="selectedMonster.trait" class="divider divider-accent font-bold mb-0">Traits</div>
-                    <TraitsComponent v-if="selectedMonster.trait" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
-                    <div v-if="selectedMonster.spellcasting" class="divider divider-accent font-bold mb-0">Spells</div>
-                    <SpellsComponent v-if="selectedMonster.spellcasting" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
-                    <div v-if="selectedMonster.action" class="divider divider-accent font-bold mb-0">Actions</div>
-                    <ActionsComponent v-if="selectedMonster.action" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
-                    <div v-if="selectedMonster.bonus" class="divider divider-accent font-bold mb-0">Bonus Actions</div>
-                    <BonusActionsComponent v-if="selectedMonster.bonus" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
-                    <div v-if="selectedMonster.reaction" class="divider divider-accent font-bold mb-0">Reactions</div>
-                    <ReactionsComponent v-if="selectedMonster.reaction" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
-                    <div v-if="selectedMonster.legendary" class="divider divider-accent font-bold mb-0">Legendary Actions</div>
-                    <LegendaryActionsComponent v-if="selectedMonster.legendary" :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
+                    <TraitsComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
+                    <ActionsComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
+                    <BonusActionsComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
+                    <ReactionsComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
+                    <LegendaryActionsComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDiceWithRumble(value, rollMode)" />
                 </div>
             </div>
         </div>

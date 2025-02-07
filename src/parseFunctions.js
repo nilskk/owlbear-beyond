@@ -4,9 +4,14 @@ function capitalize(value) {
     return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 };
 
+function removeMatchingElements(array, stringsToMatch) {
+    return array.filter(element => !stringsToMatch.includes(element));
+}
+
 function handlePipe(value, mode="first") {
     if (value.includes('|')) {
-        const parts = value.split('|');
+        let parts = value.split('|');
+        parts = removeMatchingElements(parts, ['XPHB']);
         if (mode === 'first') return parts[0];
         if (mode === 'last') return parts[parts.length - 1];
     }
@@ -35,6 +40,9 @@ function parseText(value) {
     value = value.replaceAll('{@h}', '')
     value = value.replaceAll('{@actSaveFail}', '{@actSaveFail 1}')
     value = value.replaceAll('{@actSaveSuccess}', '{@actSaveSuccess 1}')
+    value = value.replaceAll('{@actSaveSuccessOrFail}', '{@actSaveSuccessOrFail 1}')
+    value = value.replaceAll('{@actTrigger}', '{@actTrigger 1}')
+    value = value.replaceAll('{@actResponse}', '{@actResponse 1}')
 
     value = value.replace(/{@([^ ]+)( ([^}]+))?}/g, function(match, tagName, _, tagValue) {
         if (tagValue) {
@@ -75,12 +83,20 @@ function parseText(value) {
                 return convertFilter(tagValue);
             case 'actSave':
                 return convertSave(tagValue);
+            case 'hitYourSpellAttack':
+                return convertToPrimaryText(tagValue);
+            case 'variantrule':
+                return convertVariantRule(tagValue);
             case 'actSaveFail':
                 return convertSaveFail();
             case 'actSaveSuccess':
                 return convertSaveSuccess();
-            case 'hitYourSpellAttack':
-                return convertToPrimaryText(tagValue);
+            case 'actSaveSuccessOrFail':
+                return convertSaveSuccessOrFail();
+            case 'actTrigger':
+                return convertTrigger();
+            case 'actResponse':
+                return convertResponse();
             default:
                 return match; // if no matching tag, return the original string
         }
@@ -198,12 +214,31 @@ function convertSave(value) {
     return `<span class="text-primary">${displayValue} Saving Throw:</span>`;
 }
 
+function convertVariantRule(value) {
+    let displayValue = handlePipe(value, "last");
+    return `<span>${displayValue}</span>`;
+}
+
 function convertSaveFail() {
-    return `<span class="text-primary">Failure:</span>`;
+    return `<br><span class="font-bold">Failure:</span>`;
 }
 
 function convertSaveSuccess() {
-    return `<span class="text-primary">Success:</span>`;
+    return `<br><span class="font-bold">Success:</span>`;
 }
+
+function convertSaveSuccessOrFail() {
+    return `<br><span class="font-bold">Failure or Success:</span>`;
+}
+
+function convertTrigger() {
+    return `<span class="font-bold">Trigger:</span>`;
+}
+
+function convertResponse() {
+    return `<span class="font-bold">Response:</span>`;
+}
+
+
 
 export { parseText, capitalize, parseSpecialHp, parseSpecialAc };

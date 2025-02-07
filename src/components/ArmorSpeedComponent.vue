@@ -6,8 +6,6 @@ const props = defineProps({
     monster: Object
 })
 
-const { monster } = toRefs(props)
-
 const isBoolean = (value) => {
     return typeof value === 'boolean';
 };
@@ -20,7 +18,7 @@ const isBoolean = (value) => {
         <p class="w-full break-words space-x-1">
             <span class="font-bold">Armor</span>
             <span class="font-bold">Class:</span>
-            <span v-for="ac_elem in monster.ac" class="break-words space-x-1">
+            <span v-for="ac_elem in props.monster.ac" class="break-words space-x-1">
                 <span v-if="ac_elem.ac" class="text-primary font-bold">{{ ac_elem.ac }}</span>
                 <span v-else-if="ac_elem.special" class="text-primary font-bold">{{ ac_elem.special }}</span>
                 <span v-else class="text-primary font-bold">{{ ac_elem }}</span>
@@ -38,14 +36,14 @@ const isBoolean = (value) => {
         <p class="w-full break-words space-x-1">
             <span class="font-bold">Hit</span>
             <span class="font-bold">Points:</span>
-            <span v-if="monster.hp.average" class="text-primary font-bold">{{ monster.hp.average }}</span>
-            <span v-if="monster.hp.formula" class="">({{ monster.hp.formula }})</span>
-            <span v-if="monster.hp.special" class="text-primary font-bold">{{ monster.hp.special }}</span>
+            <span v-if="props.monster.hp.average" class="text-primary font-bold">{{ props.monster.hp.average }}</span>
+            <span v-if="props.monster.hp.formula" class="">({{ props.monster.hp.formula }})</span>
+            <span v-if="props.monster.hp.special" class="text-primary font-bold">{{ props.monster.hp.special }}</span>
         </p>
         <!-- Speed -->
         <p class="w-full break-words space-x-1">
             <span class="font-bold">Speed:</span>
-            <span v-for="(item, key) in monster.speed" class="break-words space-x-1">
+            <span v-for="(item, key) in props.monster.speed" class="break-words space-x-1">
                 <span v-if="!isBoolean(item)" class="space-x-1">
                     <span class="text-primary font-bold" v-if="item.number">{{ item.number }} ft.</span>
                     <span class="text-primary font-bold" v-else>{{ item }} ft.</span>
@@ -56,10 +54,10 @@ const isBoolean = (value) => {
             </span>
         </p>
         <!-- Challenge Rating -->
-        <p v-if="monster.cr" class="w-full break-words space-x-1">
+        <p v-if="props.monster.cr" class="w-full break-words space-x-1">
             <span class="font-bold">Challenge:</span>
-            <span v-if="monster.cr.cr" class="font-bold text-primary">{{ monster.cr.cr }}</span>
-            <span v-else class="font-bold text-primary">{{ monster.cr }}</span>
+            <span v-if="props.monster.cr.cr" class="font-bold text-primary">{{ props.monster.cr.cr }}</span>
+            <span v-else class="font-bold text-primary">{{ props.monster.cr }}</span>
         </p>
     </div>
 </template>

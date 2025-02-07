@@ -6,8 +6,6 @@ const props = defineProps({
     monster: Object
 })
 
-const { monster } = toRefs(props)
-
 const attributeModifier = (attribute) => Math.floor((attribute - 10) / 2);
 
 const emit = defineEmits(['rollDice'])
@@ -59,22 +57,22 @@ onUpdated(attachListeners);
                 <tr>
                     <td>STR</td>
                     <td>
-                        <div class="text-primary ">{{ monster.str }}</div>
+                        <div class="text-primary ">{{ props.monster.str }}</div>
                     </td>
                     <td>
                         <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton" >
-                            {{attributeModifier(monster.str) >= 0 ? '+' : '' }}{{attributeModifier(monster.str) }}
+                            {{attributeModifier(props.monster.str) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.str) }}
                         </button>
                     </td>
                     <td>
-                        <p v-if=monster.save?.str>
+                        <p v-if=props.monster.save?.str>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{monster.save.str}}
+                                {{props.monster.save.str}}
                             </button>
                         </p>
                         <p v-else>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{attributeModifier(monster.str) >= 0 ? '+' : '' }}{{attributeModifier(monster.str) }}
+                                {{attributeModifier(props.monster.str) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.str) }}
                             </button>
                         </p>
                     </td>
@@ -82,22 +80,22 @@ onUpdated(attachListeners);
                 <tr>
                     <td>INT</td>
                     <td>
-                        <div class="text-primary">{{ monster.int }}</div>
+                        <div class="text-primary">{{ props.monster.int }}</div>
                     </td>
                     <td>
                         <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton" >
-                            {{attributeModifier(monster.int) >= 0 ? '+' : '' }}{{attributeModifier(monster.int) }}
+                            {{attributeModifier(props.monster.int) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.int) }}
                         </button>
                     </td>
                     <td>
-                        <p v-if=monster.save?.int>
+                        <p v-if=props.monster.save?.int>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{monster.save.int}}
+                                {{props.monster.save.int}}
                             </button>
                         </p>
                         <p v-else>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{attributeModifier(monster.int) >= 0 ? '+' : '' }}{{attributeModifier(monster.int) }}
+                                {{attributeModifier(props.monster.int) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.int) }}
                             </button>
                         </p>
                     </td>
@@ -116,22 +114,22 @@ onUpdated(attachListeners);
                 <tr>
                     <td>DEX</td>
                     <td>
-                        <div class="text-primary ">{{ monster.dex }}</div>
+                        <div class="text-primary ">{{ props.monster.dex }}</div>
                     </td>
                     <td>
                         <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton" >
-                            {{attributeModifier(monster.dex) >= 0 ? '+' : '' }}{{attributeModifier(monster.dex) }}
+                            {{attributeModifier(props.monster.dex) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.dex) }}
                         </button>
                     </td>
                     <td>
-                        <p v-if=monster.save?.dex>
+                        <p v-if=props.monster.save?.dex>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{monster.save.dex}}
+                                {{props.monster.save.dex}}
                             </button>
                         </p>
                         <p v-else>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{attributeModifier(monster.dex) >= 0 ? '+' : '' }}{{attributeModifier(monster.dex) }}
+                                {{attributeModifier(props.monster.dex) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.dex) }}
                             </button>
                         </p>
                     </td>
@@ -139,22 +137,22 @@ onUpdated(attachListeners);
                 <tr>
                     <td>WIS</td>
                     <td>
-                        <div class="text-primary">{{ monster.wis }}</div>
+                        <div class="text-primary">{{ props.monster.wis }}</div>
                     </td>
                     <td>
                         <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton" >
-                            {{attributeModifier(monster.wis) >= 0 ? '+' : '' }}{{attributeModifier(monster.wis) }}
+                            {{attributeModifier(props.monster.wis) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.wis) }}
                         </button>
                     </td>
                     <td>
-                        <p v-if=monster.save?.wis>
+                        <p v-if=props.monster.save?.wis>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{monster.save.wis}}
+                                {{props.monster.save.wis}}
                             </button>
                         </p>
                         <p v-else>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{attributeModifier(monster.wis) >= 0 ? '+' : '' }}{{attributeModifier(monster.wis) }}
+                                {{attributeModifier(props.monster.wis) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.wis) }}
                             </button>
                         </p>
                     </td>
@@ -173,22 +171,22 @@ onUpdated(attachListeners);
                 <tr>
                     <td>CON</td>
                     <td>
-                        <div class="text-primary ">{{ monster.con }}</div>
+                        <div class="text-primary ">{{ props.monster.con }}</div>
                     </td>
                     <td>
                         <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton" >
-                            {{attributeModifier(monster.con) >= 0 ? '+' : '' }}{{attributeModifier(monster.con) }}
+                            {{attributeModifier(props.monster.con) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.con) }}
                         </button>
                     </td>
                     <td>
-                        <p v-if=monster.save?.con>
+                        <p v-if=props.monster.save?.con>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{monster.save.con}}
+                                {{props.monster.save.con}}
                             </button>
                         </p>
                         <p v-else>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{attributeModifier(monster.con) >= 0 ? '+' : '' }}{{attributeModifier(monster.con) }}
+                                {{attributeModifier(props.monster.con) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.con) }}
                             </button>
                         </p>
                     </td>
@@ -196,22 +194,22 @@ onUpdated(attachListeners);
                 <tr>
                     <td>CHA</td>
                     <td>
-                        <div class="text-primary">{{ monster.cha }}</div>
+                        <div class="text-primary">{{ props.monster.cha }}</div>
                     </td>
                     <td>
                         <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton" >
-                            {{attributeModifier(monster.cha) >= 0 ? '+' : '' }}{{attributeModifier(monster.cha) }}
+                            {{attributeModifier(props.monster.cha) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.cha) }}
                         </button>
                     </td>
                     <td>
-                        <p v-if=monster.save?.cha>
+                        <p v-if=props.monster.save?.cha>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{monster.save.cha}}
+                                {{props.monster.save.cha}}
                             </button>
                         </p>
                         <p v-else>
                             <button class="btn btn-xs btn-outline btn-accent font-bold rollButton" >
-                                {{attributeModifier(monster.cha) >= 0 ? '+' : '' }}{{attributeModifier(monster.cha) }}
+                                {{attributeModifier(props.monster.cha) >= 0 ? '+' : '' }}{{attributeModifier(props.monster.cha) }}
                             </button>
                         </p>
                     </td>
