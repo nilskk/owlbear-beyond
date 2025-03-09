@@ -14,8 +14,6 @@ const state = {
 };
 
 
-
-
 OBR.onReady(async() => {
     const role = await OBR.player.getRole();
     if(role == 'GM') {

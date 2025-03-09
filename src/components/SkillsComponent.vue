@@ -7,20 +7,20 @@ const props = defineProps({
     monster: Object
 })
 
-const emit = defineEmits(['rollDice'])
+const emit = defineEmits(['rollDiceSkill'])
 
 const attachListeners = async () => {
     await nextTick();
     const handleButtonClick = (event) => {
-        emit('rollDice', event.target.innerText, "normal");
+        emit('rollDiceSkill', event.target.innerText, "normal");
     };
 
     const handleButtonRightClick = (event) => {
-        emit('rollDice', event.target.innerText, "advantage");
+        emit('rollDiceSkill', event.target.innerText, "advantage");
     };
 
     const handleButtonMiddleClick = (event) => {
-        emit('rollDice', event.target.innerText, "disadvantage");
+        emit('rollDiceSkill', event.target.innerText, "disadvantage");
     };
 
     const buttons = document.getElementsByClassName('rollButton');

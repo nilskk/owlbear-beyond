@@ -8,20 +8,20 @@ const props = defineProps({
 
 const attributeModifier = (attribute) => Math.floor((attribute - 10) / 2);
 
-const emit = defineEmits(['rollDice'])
+const emit = defineEmits(['rollDiceAttribute'])
 
 const attachListeners = async () => {
     await nextTick();
     const handleButtonClick = (event) => {
-        emit('rollDice', event.target.innerText, "normal");
+        emit('rollDiceAttribute', event.target.innerText, "normal");
     };
 
     const handleButtonRightClick = (event) => {
-        emit('rollDice', event.target.innerText, "advantage");
+        emit('rollDiceAttribute', event.target.innerText, "advantage");
     };
 
     const handleButtonMiddleClick = (event) => {
-        emit('rollDice', event.target.innerText, "disadvantage");
+        emit('rollDiceAttribute', event.target.innerText, "disadvantage");
     };
 
     const buttons = document.getElementsByClassName('rollButton');

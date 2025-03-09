@@ -9,7 +9,7 @@ const props = defineProps({
     monster: Object
 })
 
-const emit = defineEmits(['rollDice'])
+const emit = defineEmits(['rollDiceAction'])
 
 const spellsAsActions = computed(() => {
     return props.monster.spellcasting ? props.monster.spellcasting.filter(item => item.displayAs && item.displayAs == 'action') : [];
@@ -19,15 +19,15 @@ console.log(spellsAsActions)
 const attachListeners = async () => {
     await nextTick();
     const handleButtonClick = (event) => {
-        emit('rollDice', event.target.innerText, "normal");
+        emit('rollDiceAction', event.target.innerText, "normal");
     };
 
     const handleButtonRightClick = (event) => {
-        emit('rollDice', event.target.innerText, "advantage");
+        emit('rollDiceAction', event.target.innerText, "advantage");
     };
 
     const handleButtonMiddleClick = (event) => {
-        emit('rollDice', event.target.innerText, "disadvantage");
+        emit('rollDiceAction', event.target.innerText, "disadvantage");
     };
 
     const buttons = document.getElementsByClassName('rollButton');

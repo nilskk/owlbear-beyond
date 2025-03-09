@@ -1,15 +1,16 @@
-import OBR from "@owlbear-rodeo/sdk"
+import { DiceRoll } from '@dice-roller/rpg-dice-roller';
 
-function rollDiceWithRumble(diceString, rollMode="normal") {
+function rollDiceWithDiceRoller(diceString, rollMode="normal") {
     diceString = convertDiceString(diceString, rollMode);
-    OBR.player.setMetadata({
-        'com.battle-system.friends/metadata_diceroll': {
-            notation: diceString,
-            created: new Date().toISOString(),
-            sender: 'owlbear-beyond',
-            targetId: OBR.player.id
-        }
-      })
+    const roll = new DiceRoll(diceString);
+    const diceOutput = roll.output;
+    
+    return processDiceOutput(diceOutput);
+}
+
+function processDiceOutput(diceOutput) {
+    const splitValues = diceOutput.split(/[:=]/).map(value => value.trim());
+    return splitValues;
 }
 
 function convertDamageToCritRoll(damageString) {
@@ -35,14 +36,14 @@ function convertDamageToCritRoll(damageString) {
 
 function convertDiceString(value, rollMode) {
     if (rollMode === 'advantage') {
-        return (value.startsWith('+') || value.startsWith('-')) ? `2d20kh${value}` : convertDamageToCritRoll(value);
+        return (value.startsWith('+') || value.startsWith('-')) ? `2d20dl1${value}` : convertDamageToCritRoll(value);
     }
     if (rollMode === 'disadvantage') {
-        return (value.startsWith('+') || value.startsWith('-')) ? `2d20kl${value}` : convertDamageToCritRoll(value);
+        return (value.startsWith('+') || value.startsWith('-')) ? `2d20dh1${value}` : convertDamageToCritRoll(value);
     }
     if (rollMode === 'normal') {
         return (value.startsWith('+') || value.startsWith('-')) ? `1d20${value}` : value;
     }
 }
 
-export { rollDiceWithRumble }
+export { rollDiceWithDiceRoller }
