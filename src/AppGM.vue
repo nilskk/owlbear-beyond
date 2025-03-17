@@ -115,7 +115,6 @@ function handlePlayerChange(player) {
 
 function handleGrimoireInitiaveChange(items) {
     if (!items) return;
-    console.log(items);
     let grimoireIndicator = items.filter(item => item.name == "GM's Grimoire - Indicator")[0];
     if (!grimoireIndicator) return; // Add this check
     // console.log(grimoireIndicator);
