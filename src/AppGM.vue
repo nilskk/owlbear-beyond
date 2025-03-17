@@ -102,18 +102,22 @@ function handlePlayerChange(player) {
         playerSelection.value = null;
         return;
     } 
-    OBR.scene.items.getItems([player.selection[0]]).then((items) => {
+    OBR.scene.items.getItems(Array.isArray(player.selection) && player.selection.length > 0 ? [player.selection[0]] : []).then((items) => {
+    if (items.length > 0) {
         // console.log(items);
         showMonsterSheet(items[0]);
         if (items[0].layer == 'CHARACTER') {
             playerSelection.value = items[0]; 
         }
-    }); 
+    }
+}); 
 }
 
 function handleGrimoireInitiaveChange(items) {
     if (!items) return;
+    console.log(items);
     let grimoireIndicator = items.filter(item => item.name == "GM's Grimoire - Indicator")[0];
+    if (!grimoireIndicator) return; // Add this check
     // console.log(grimoireIndicator);
     OBR.scene.items.getItems([grimoireIndicator.attachedTo]).then((items) => {
         // console.log(items);
