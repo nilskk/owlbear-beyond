@@ -160,22 +160,14 @@ const compositeString = computed(() => {
 </script>
 
 <template>
-    <!-- Old simple dice roll display (kept for backward compatibility) -->
-    <div class="stats bg-neutral z-50 fixed bottom-1 right-1" v-if="diceRollResult !== null && lastDiceRolls.length === 0">
-        <div class="stat">
-            <div class="stat-title">{{ compositeString }}</div>
-            <div class="stat-value text-primary">{{ diceRollResult[2] }}</div>
-            <div class="stat-desc">{{ diceRollResult[1] }}</div>
-        </div>
-    </div>
-    
     <LinkTokenModal 
         ref="linkTokenModal"
         :playerSelection="playerSelection" 
         :selectedMonster="selectedMonster" 
     />
     <GlobalRollContextMenu />
-    <div class="flex flex-col">
+    
+    <div class="flex flex-col h-screen">
         <NavbarComponent 
             :selectedMonster="selectedMonster"
             :groupedBestiary="groupedBestiary"
@@ -183,7 +175,7 @@ const compositeString = computed(() => {
             @selectMonster="selectMonster"
             @updateTokens="updateTokens"
         />
-        <div v-if="selectedMonster">
+        <div v-if="selectedMonster" class="overflow-y-auto overflow-x-hidden flex-1">
             <div v-if="selectedMonster._copy">
                 <p class="text-primary text-5xl font-bold">
                     Creature can't be shown, because it is dependent on other creatures. Use 5e.tools to get the full creature.
@@ -202,29 +194,31 @@ const compositeString = computed(() => {
                 <LegendaryActionsComponent :monster="selectedMonster" @rollDiceLegendaryAction="rollDice" />
             </div>
         </div>
+
+        <!-- Round D20 Toggle Button -->
+        <div class="absolute bottom-8 right-8 z-20">
+            <button @click="toggleDiceRolls" 
+                    class="btn btn-circle btn-lg btn-primary shadow-lg hover:shadow-xl transition-all"
+                    :class="{ 
+                        'btn-active': diceRollsVisible,
+                        'btn-disabled opacity-50': lastDiceRolls.length === 0
+                    }"
+                    :disabled="lastDiceRolls.length === 0">
+                <!-- D20 Icosahedron SVG from dice CSS -->
+                <svg width="28" height="31" viewBox="0 0 28 31" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+                    <path d="M14 0L0 7.5V22.7L14 30.2L27 23.2L28 22.6V7.5L14 0ZM12 8.3L6.1 17.1L2.4 9.1L12 8.3ZM8 18L14 8.9L20 18H8ZM21.8 17.1L16 8.3L25.5 9L21.8 17.1ZM15 2.8L22.4 6.8L15 6.2V2.8ZM13 2.8V6.2L5.6 6.8L13 2.8ZM2 12.8L4.7 18.8L2 20.4V12.8ZM3 22.1L5.7 20.5L10.1 26L3 22.1ZM8 20H19L14 27.5L8 20ZM17.9 25.9L22.3 20.4L25 22L17.9 25.9ZM23.5 18.9L23.3 18.8L26 12.8V20.4L23.5 18.9Z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- New detailed dice roll display -->
+        <DiceRollDisplay 
+            :diceRollsVisible="diceRollsVisible"
+            :lastDiceRolls="lastDiceRolls"
+        />
     </div>
     
-    <!-- Round D20 Toggle Button -->
-    <div class="fixed bottom-8 right-8 z-20">
-        <button @click="toggleDiceRolls" 
-                class="btn btn-circle btn-lg btn-primary shadow-lg hover:shadow-xl transition-all"
-                :class="{ 
-                    'btn-active': diceRollsVisible,
-                    'btn-disabled opacity-50': lastDiceRolls.length === 0
-                }"
-                :disabled="lastDiceRolls.length === 0">
-            <!-- D20 Icosahedron SVG from dice CSS -->
-            <svg width="28" height="31" viewBox="0 0 28 31" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
-                <path d="M14 0L0 7.5V22.7L14 30.2L27 23.2L28 22.6V7.5L14 0ZM12 8.3L6.1 17.1L2.4 9.1L12 8.3ZM8 18L14 8.9L20 18H8ZM21.8 17.1L16 8.3L25.5 9L21.8 17.1ZM15 2.8L22.4 6.8L15 6.2V2.8ZM13 2.8V6.2L5.6 6.8L13 2.8ZM2 12.8L4.7 18.8L2 20.4V12.8ZM3 22.1L5.7 20.5L10.1 26L3 22.1ZM8 20H19L14 27.5L8 20ZM17.9 25.9L22.3 20.4L25 22L17.9 25.9ZM23.5 18.9L23.3 18.8L26 12.8V20.4L23.5 18.9Z" />
-            </svg>
-        </button>
-    </div>
-
-    <!-- New detailed dice roll display -->
-    <DiceRollDisplay 
-        :diceRollsVisible="diceRollsVisible"
-        :lastDiceRolls="lastDiceRolls"
-    />
+    
 </template>
 
 <style scoped>

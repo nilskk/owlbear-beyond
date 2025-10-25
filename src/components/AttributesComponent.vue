@@ -17,10 +17,12 @@ useRollButtonListeners(emit, 'rollDiceAttribute');
     <div class="join w-full justify-evenly">
         <table class="table table-xs table-zebra font-bold">
             <thead>
-                <th></th>
-                <th></th>
-                <th>MOD</th>
-                <th>SAVE</th>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>MOD</th>
+                    <th>SAVE</th>
+                </tr>
             </thead>
             <tbody>
                 <tr>
@@ -74,10 +76,12 @@ useRollButtonListeners(emit, 'rollDiceAttribute');
         <div class="divider divider-horizontal m-0"></div>
         <table class="table table-xs table-zebra font-bold">
             <thead>
-                <th></th>
-                <th></th>
-                <th>MOD</th>
-                <th>SAVE</th>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>MOD</th>
+                    <th>SAVE</th>
+                </tr>
             </thead>
             <tbody>
                 <tr>
@@ -131,10 +135,12 @@ useRollButtonListeners(emit, 'rollDiceAttribute');
         <div class="divider divider-horizontal m-0"></div>
         <table class="table table-xs table-zebra font-bold">
             <thead>
-                <th></th>
-                <th></th>
-                <th>MOD</th>
-                <th>SAVE</th>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>MOD</th>
+                    <th>SAVE</th>
+                </tr>
             </thead>
             <tbody>
                 <tr>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { vOnClickOutside } from '@vueuse/components'
 import UploadModal from './UploadModal.vue';
 
 const ID = 'com.nilskk.owlbear-beyond';
@@ -27,8 +28,13 @@ const filteredGroupedBestiary = computed(() => {
     return filtered;
 });
 
+const clearInput = () => {
+    searchInput.value = '';
+};
+
 const selectMonster = (monster) => {
     emit('selectMonster', monster);
+    clearInput();
 };
 
 const updateTokens = () => {
@@ -37,9 +43,9 @@ const updateTokens = () => {
 </script>
 
 <template>
-    <div class="navbar bg-base-300">
+    <div class="navbar bg-base-300 flex-shrink-0">
         <div  class="flex-1 justify-start">
-            <div v-if="selectedMonster" class="dropdown dropdown-begin z-50">
+            <div v-if="selectedMonster" class="dropdown dropdown-begin z-50" v-on-click-outside="clearInput">
                 <input tabindex="0" type="search" class="input m-1" :placeholder="selectedMonster.name"
                     v-model="searchInput" @focus="$event.target.select()">
                 <ul tabindex="0"
