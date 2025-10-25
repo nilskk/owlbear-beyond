@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRefs, onMounted, onUpdated, nextTick, computed } from 'vue'
+import { computed } from 'vue'
 import { parseText } from '../parseFunctions';
 import { useRollButtonListeners } from '../composables/useRollButtonListeners';
 import SpellsComponent from './SpellsComponent.vue';
@@ -16,37 +16,7 @@ const spellsAsActions = computed(() => {
 });
 console.log(spellsAsActions)
 
-const attachListeners = async () => {
-    await nextTick();
-    const handleButtonClick = (event) => {
-        emit('rollDiceAction', event.target.innerText, "normal");
-    };
-
-    const handleButtonRightClick = (event) => {
-        emit('rollDiceAction', event.target.innerText, "advantage");
-    };
-
-    const handleButtonMiddleClick = (event) => {
-        emit('rollDiceAction', event.target.innerText, "disadvantage");
-    };
-
-    const buttons = document.getElementsByClassName('rollButton');
-    Array.from(buttons).forEach(button => {
-        button.addEventListener('click', handleButtonClick);
-        button.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
-            handleButtonRightClick(event);
-        });
-        button.addEventListener('mousedown', (event) => {
-            if (event.button === 1) {
-                event.preventDefault();
-                handleButtonMiddleClick(event);
-            }
-        });
-    });
-};
-onMounted(attachListeners);
-onUpdated(attachListeners);
+useRollButtonListeners(emit, 'rollDiceAction');
 
 </script>
 

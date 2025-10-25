@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted, ref, toRefs, onUpdated, nextTick } from 'vue'
 import { capitalize } from '../parseFunctions';
 import { useRollButtonListeners } from '../composables/useRollButtonListeners';
 
@@ -9,37 +8,7 @@ const props = defineProps({
 
 const emit = defineEmits(['rollDiceSkill'])
 
-const attachListeners = async () => {
-    await nextTick();
-    const handleButtonClick = (event) => {
-        emit('rollDiceSkill', event.target.innerText, "normal");
-    };
-
-    const handleButtonRightClick = (event) => {
-        emit('rollDiceSkill', event.target.innerText, "advantage");
-    };
-
-    const handleButtonMiddleClick = (event) => {
-        emit('rollDiceSkill', event.target.innerText, "disadvantage");
-    };
-
-    const buttons = document.getElementsByClassName('rollButton');
-    Array.from(buttons).forEach(button => {
-        button.addEventListener('click', handleButtonClick);
-        button.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
-            handleButtonRightClick(event);
-        });
-        button.addEventListener('mousedown', (event) => {
-            if (event.button === 1) {
-                event.preventDefault();
-                handleButtonMiddleClick(event);
-            }
-        });
-    });
-};
-onMounted(attachListeners);
-onUpdated(attachListeners);
+useRollButtonListeners(emit, 'rollDiceSkill');
 
 </script>
 

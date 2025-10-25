@@ -7,28 +7,25 @@ import ActionsComponent from './components/ActionsComponent.vue';
 import BonusActionsComponent from './components/BonusActionsComponent.vue';
 import ReactionsComponent from './components/ReactionsComponent.vue';
 import LegendaryActionsComponent from './components/LegendaryActionsComponent.vue';
-import RollComponent from './components/RollComponent.vue';
+import LinkTokenModal from './components/LinkTokenModal.vue';
+import NavbarComponent from './components/NavbarComponent.vue';
+import GlobalRollContextMenu from './components/GlobalRollContextMenu.vue';
+import DiceRollDisplay from './components/DiceRollDisplay.vue';
 import { ref, computed, onMounted } from 'vue'
-import { vOnClickOutside } from '@vueuse/components'
 import { db } from './db'
-import { writeBulkToTable, clearTable } from './dbFunctions'
 import { rollDiceWithDiceRoller } from './diceFunctions';
-import { parseSpecialHp, parseSpecialAc } from './parseFunctions';
 import OBR from '@owlbear-rodeo/sdk';
 
 
 const ID = 'com.nilskk.owlbear-beyond';
-const CLASH_ID = 'com.battle-system.clash';
-const GRIMOIRE_ID = 'com.bitperfect-software.hp-tracker'
-const CLASH_LABEL_ID = '56d6b2c4-cd17-11ed-afa1-0242ac120002';
 
-const searchInput = ref('');
-const fileInput = ref(null);
-const myModal = ref(null);
+const linkTokenModal = ref(null);
 const playerSelection = ref(null)
 const selectedMonster = ref(null);
 const groupedBestiary = ref({});
 const diceRollResult = ref(null);
+const lastDiceRolls = ref([]); // Array to store last rolls with monster info
+const diceRollsVisible = ref(false); // Simple visibility state for dice rolls
 let timeoutId = null;
 
 onMounted(async () => {
@@ -45,8 +42,52 @@ onMounted(async () => {
     }
 });
 
+const showDiceRolls = () => {
+    // Show dice rolls
+    diceRollsVisible.value = true;
+};
+
+const addRollToHistory = (rollResult, monster) => {
+    const rollWithMonster = {
+        ...rollResult,
+        monster: { name: monster.name, id: monster.name } // Store monster info
+    };
+    
+    // Add to beginning of array and keep only last 3
+    lastDiceRolls.value.unshift(rollWithMonster);
+    if (lastDiceRolls.value.length > 3) {
+        lastDiceRolls.value = lastDiceRolls.value.slice(0, 3);
+    }
+};
+
+const toggleDiceRolls = () => {
+    if (diceRollsVisible.value) {
+        // Currently showing rolls, so hide them
+        diceRollsVisible.value = false;
+    } else if (lastDiceRolls.value.length > 0) {
+        // Show rolls manually (no timer for manual toggle)
+        diceRollsVisible.value = true;
+    }
+};
+
 const rollDice = (value, rollMode) => {
-    diceRollResult.value = rollDiceWithDiceRoller(value, rollMode);
+    // Clear any existing dice result when starting a new roll
+    diceRollResult.value = null;
+    
+    const result = rollDiceWithDiceRoller(value, rollMode, value);
+    console.log(result);
+    
+    // Store simple result for backward compatibility
+    diceRollResult.value = result.simple;
+    
+    // Add detailed result to history
+    if (result.detailed && selectedMonster.value) {
+        addRollToHistory(result.detailed, selectedMonster.value);
+    }
+    
+    // Show dice rolls
+    showDiceRolls();
+    
     if (timeoutId) {
         clearTimeout(timeoutId); // Clear the existing timeout
     }
@@ -58,41 +99,10 @@ const rollDice = (value, rollMode) => {
 
 const selectMonster = (monster) => {
     selectedMonster.value = monster;
-};
-
-const filteredGroupedBestiary = computed(() => {
-    if (!searchInput.value) {
-        return groupedBestiary.value;
-    }
-    const filtered = {};
-    for (const source in groupedBestiary.value) {
-        filtered[source] = groupedBestiary.value[source].filter(monster =>
-            monster.name.toLowerCase().includes(searchInput.value.toLowerCase())
-        );
-    }
-    return filtered;
-});
-
-const clearInput = () => {
-    searchInput.value = '';
-};
-
-const saveJson = () => {
-  const files = fileInput.value.files;
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const json = JSON.parse(e.target.result);
-      const monster_list = json.monster;
-      writeBulkToTable(monster_list);
-    };
-    reader.readAsText(file);
-  }
-};
-
-const deleteData = () => {
-    clearTable();
+    // Auto-close dice rolls when switching monsters
+    diceRollsVisible.value = false;
+    diceRollResult.value = null;
+    // Keep roll history across monsters (now stores monster info with each roll)
 };
 
 let lastCreature = null;
@@ -139,74 +149,7 @@ OBR.player.onChange(handlePlayerChange);
 OBR.scene.items.onChange(handleGrimoireInitiaveChange);
 
 const updateTokens = () => {
-    myModal.value.showModal();
-};
-
-const confirmTokenUpdate = () => {
-    OBR.player.getSelection().then((itemIds) => {
-        console.log(itemIds);
-        if (itemIds.length > 0) {
-            OBR.scene.items.getItems(itemIds).then((items) => {
-                console.log(items);
-                OBR.scene.items.updateItems(items, (items2) => {
-                    for (let item of items2) {
-                        item.metadata[`${ID}/monstersheet`] = JSON.parse(JSON.stringify(selectedMonster.value))
-                        // if(Number.isInteger(selectedMonster.value.ac[0])) {
-                        //     item.metadata[`${CLASH_ID}/clash_armorClass`] = selectedMonster.value.ac[0];
-                        // } 
-                        // else if (selectedMonster.value.ac[0].ac) {
-                        //     item.metadata[`${CLASH_ID}/clash_armorClass`] = selectedMonster.value.ac[0].ac;
-                        // }
-                        // else if (selectedMonster.value.ac[0].special) {
-                        //     item.metadata[`${CLASH_ID}/clash_armorClass`] = parseSpecialAc(selectedMonster.value.ac[0].special);
-                        // }
-                        // item.metadata[`${CLASH_ID}/clash_maxHP`] = selectedMonster.value.hp.average || parseSpecialHp(selectedMonster.value.hp.special);
-                        // item.metadata[`${CLASH_ID}/clash_currentHP`] = selectedMonster.value.hp.average || parseSpecialHp(selectedMonster.value.hp.special);
-                        // item.metadata[`${CLASH_ID}/clash_dexSave`] = Math.floor((selectedMonster.value.dex - 10) / 2);
-                        // item.metadata[`${CLASH_ID}/clash_dexScore`] = selectedMonster.value.dex
-                        // item.metadata[`${CLASH_ID}/clash_initiative`] = 10 + Math.floor((selectedMonster.value.dex - 10) / 2);
-                        // item.metadata[`${CLASH_ID}/clash_unitName`] = selectedMonster.value.name;
-                        // // Set Clash ID to have a the metadata applied directly
-                        // item.metadata[`${CLASH_ID}/clash_id`] = item.id;
-                        item.metadata[`${GRIMOIRE_ID}/data`] = {};
-                        item.metadata[`${GRIMOIRE_ID}/data`]["acOnMap"] = false;
-                        if(Number.isInteger(selectedMonster.value.ac[0])) {
-                            item.metadata[`${GRIMOIRE_ID}/data`]["armorClass"] = selectedMonster.value.ac[0];
-                        } 
-                        else if (selectedMonster.value.ac[0].ac) {
-                            item.metadata[`${GRIMOIRE_ID}/data`]["armorClass"] = selectedMonster.value.ac[0].ac;
-                        }
-                        else if (selectedMonster.value.ac[0].special) {
-                            item.metadata[`${GRIMOIRE_ID}/data`]["armorClass"] = parseSpecialAc(selectedMonster.value.ac[0].special);
-                        }
-                        item.metadata[`${GRIMOIRE_ID}/data`]['equipment'] = {
-                            "attuned": [],
-                            "eqipped": [],
-                        }
-                        item.metadata[`${GRIMOIRE_ID}/data`]['hp'] = selectedMonster.value.hp.average || parseSpecialHp(selectedMonster.value.hp.special);
-                        item.metadata[`${GRIMOIRE_ID}/data`]['hpBar'] = false;
-                        item.metadata[`${GRIMOIRE_ID}/data`]['hpOnMap'] = false;
-                        item.metadata[`${GRIMOIRE_ID}/data`]['hpTrackerActive'] = true;
-                        item.metadata[`${GRIMOIRE_ID}/data`]["initiative"] = 10 + Math.floor((selectedMonster.value.dex - 10) / 2);
-                        item.metadata[`${GRIMOIRE_ID}/data`]['maxHp'] = selectedMonster.value.hp.average || parseSpecialHp(selectedMonster.value.hp.special);
-                        item.metadata[`${GRIMOIRE_ID}/data`]["playerList"] = false;
-                        item.metadata[`${GRIMOIRE_ID}/data`]["playerMap"] = {
-                            "hp": false,
-                            "ac": false,
-                        };
-                        item.metadata[`${GRIMOIRE_ID}/data`]["ruleset"] = "e5";
-                        item.metadata[`${GRIMOIRE_ID}/data`]["sheet"] = "";
-                        item.metadata[`${GRIMOIRE_ID}/data`]["stats"] = {
-                            "initial": true,
-                            "initiativeBonus": Math.floor((selectedMonster.value.dex - 10) / 2),
-                            "limits": [{"id": "Hit Dice", "max": 1, "resets": ["Long Rest"], "used": 0}],
-                        }
-                    }
-                });
-            });
-        }
-    });
-    myModal.value.close();
+    linkTokenModal.value.openModal();
 };
 
 const compositeString = computed(() => {
@@ -217,100 +160,71 @@ const compositeString = computed(() => {
 </script>
 
 <template>
-    <div class="stats bg-neutral z-50 fixed bottom-1 right-1" v-if="diceRollResult !== null">
+    <!-- Old simple dice roll display (kept for backward compatibility) -->
+    <div class="stats bg-neutral z-50 fixed bottom-1 right-1" v-if="diceRollResult !== null && lastDiceRolls.length === 0">
         <div class="stat">
             <div class="stat-title">{{ compositeString }}</div>
             <div class="stat-value text-primary">{{ diceRollResult[2] }}</div>
             <div class="stat-desc">{{ diceRollResult[1] }}</div>
         </div>
     </div>
-    <dialog v-if="playerSelection" id="my_modal_2" class="modal" ref="myModal">
-        <div class="modal-box">
-            <div class="flex flex-col justify-center space-y-3">
-                <h1 v-if="playerSelection.metadata[`${ID}/monstersheet`]" class="text-xl font-bold">Current: {{ playerSelection.metadata[`${ID}/monstersheet`].name }}</h1>
-                <h1 class="text-xl font-bold">New: {{ selectedMonster.name }}</h1>
-                <button @click="confirmTokenUpdate" class="btn btn-primary">Confirm</button>
+    
+    <LinkTokenModal 
+        ref="linkTokenModal"
+        :playerSelection="playerSelection" 
+        :selectedMonster="selectedMonster" 
+    />
+    <GlobalRollContextMenu />
+    <div class="flex flex-col">
+        <NavbarComponent 
+            :selectedMonster="selectedMonster"
+            :groupedBestiary="groupedBestiary"
+            :playerSelection="playerSelection"
+            @selectMonster="selectMonster"
+            @updateTokens="updateTokens"
+        />
+        <div v-if="selectedMonster">
+            <div v-if="selectedMonster._copy">
+                <p class="text-primary text-5xl font-bold">
+                    Creature can't be shown, because it is dependent on other creatures. Use 5e.tools to get the full creature.
+                </p>
             </div>
-            
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
-    <div class="drawer drawer-end">
-        <input id="my-drawer-1" type="checkbox" class="drawer-toggle" /> 
-        <div class="drawer-content flex flex-col">
-            <div class="navbar bg-base-300">
-                <div  class="flex-1 justify-start">
-                    <div v-if="selectedMonster" class="dropdown dropdown-begin z-50" v-on-click-outside="clearInput">
-                        <input tabindex="0" type="search" class="input m-1" :placeholder="selectedMonster.name"
-                            v-model="searchInput" @focus="$event.target.select()">
-                        <ul tabindex="0"
-                            class="dropdown-content menu menu-vertical p-2 shadow-2xl bg-base-100 rounded-box">
-                            <div className="overflow-y-auto max-h-96 w-64">
-                                <li v-for="(monsters, source) in filteredGroupedBestiary" :key="source">
-                                    <details open>
-                                        <summary>{{ source }}</summary>
-                                        <ul>
-                                            <li v-for="monster in monsters" :key="monster.name">
-                                                <a @click="selectMonster(monster)">{{ monster.name }}</a>
-                                            </li>
-                                        </ul>
-                                    </details>
-                                    
-                                </li>
-                            </div>
-                        </ul>
-                    </div>
-                </div>
-                <div class="flex-none">
-                    <button @click="updateTokens" v-if="playerSelection" class="btn btn-primary">
-                        <a v-if="playerSelection.metadata[`${ID}/monstersheet`]">Update Token</a>
-                        <a v-else>Link Token</a>
-                    </button>
-                    <label for="my-drawer-1" class="drawer-button btn btn-square btn-ghost">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            class="inline-block w-5 h-5 stroke-current">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                            </path>
-                        </svg>
-                    </label>
-                </div>
+            <div v-else>
+                <ArmorSpeedComponent :monster="selectedMonster" />
+                <div class="divider divider-accent font-bold mb-0">Attributes</div>
+                <AttributesComponent :monster="selectedMonster" @rollDiceAttribute="rollDice" />
+                <div class="divider divider-accent font-bold mb-0">Skills</div>
+                <SkillsComponent :monster="selectedMonster" @rollDiceSkill="rollDice" />
+                <TraitsComponent :monster="selectedMonster" @rollDiceTrait="rollDice" />
+                <ActionsComponent :monster="selectedMonster" @rollDiceAction="rollDice" />
+                <BonusActionsComponent :monster="selectedMonster" @rollDiceBonusAction="rollDice" />
+                <ReactionsComponent :monster="selectedMonster" @rollDiceReaction="rollDice" />
+                <LegendaryActionsComponent :monster="selectedMonster" @rollDiceLegendaryAction="rollDice" />
             </div>
-            <div v-if="selectedMonster">
-                <div v-if="selectedMonster._copy">
-                    <p class="text-primary text-5xl font-bold">
-                        Creature can't be shown, because it is dependent on other creatures. Use 5e.tools to get the full creature.
-                    </p>
-                </div>
-                <div v-else>
-                    <ArmorSpeedComponent :monster="selectedMonster" />
-                    <div class="divider divider-accent font-bold mb-0">Attributes</div>
-                    <AttributesComponent :monster="selectedMonster" />
-                    <div class="divider divider-accent font-bold mb-0">Skills</div>
-                    <SkillsComponent :monster="selectedMonster"  />
-                    <TraitsComponent :monster="selectedMonster"  />
-                    <ActionsComponent :monster="selectedMonster" />
-                    <BonusActionsComponent :monster="selectedMonster"  />
-                    <ReactionsComponent :monster="selectedMonster"  />
-                    <LegendaryActionsComponent :monster="selectedMonster" />
-                    <RollComponent :monster="selectedMonster" @rollDice="(value, rollMode) => rollDice(value, rollMode)" />
-                </div>
-            </div>
-        </div>
-        <div class="drawer-side">
-            <label for="my-drawer-1" aria-label="close sidebar" class="drawer-overlay"></label>
-            <div class="menu p-4 w-80 min-h-full bg-base-200 text-base-content flex flex-col">
-                <!-- Sidebar content here -->
-                <div class="flex-grow space-y-2">
-                    <p class="font-bold">Upload JSON Monster file</p>
-                    <input type="file" multiple ref="fileInput" class="file-input file-input-bordered file-input-sm w-full max-w-xs" />
-                    <button @click="saveJson" class="btn btn-primary w-full">Save</button>
-                    <button @click="deleteData" class="btn btn-error w-full">Delete all data</button>
-                </div> 
-            </div> 
         </div>
     </div>
+    
+    <!-- Round D20 Toggle Button -->
+    <div class="fixed bottom-8 right-8 z-20">
+        <button @click="toggleDiceRolls" 
+                class="btn btn-circle btn-lg btn-primary shadow-lg hover:shadow-xl transition-all"
+                :class="{ 
+                    'btn-active': diceRollsVisible,
+                    'btn-disabled opacity-50': lastDiceRolls.length === 0
+                }"
+                :disabled="lastDiceRolls.length === 0">
+            <!-- D20 Icosahedron SVG from dice CSS -->
+            <svg width="28" height="31" viewBox="0 0 28 31" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+                <path d="M14 0L0 7.5V22.7L14 30.2L27 23.2L28 22.6V7.5L14 0ZM12 8.3L6.1 17.1L2.4 9.1L12 8.3ZM8 18L14 8.9L20 18H8ZM21.8 17.1L16 8.3L25.5 9L21.8 17.1ZM15 2.8L22.4 6.8L15 6.2V2.8ZM13 2.8V6.2L5.6 6.8L13 2.8ZM2 12.8L4.7 18.8L2 20.4V12.8ZM3 22.1L5.7 20.5L10.1 26L3 22.1ZM8 20H19L14 27.5L8 20ZM17.9 25.9L22.3 20.4L25 22L17.9 25.9ZM23.5 18.9L23.3 18.8L26 12.8V20.4L23.5 18.9Z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- New detailed dice roll display -->
+    <DiceRollDisplay 
+        :diceRollsVisible="diceRollsVisible"
+        :lastDiceRolls="lastDiceRolls"
+    />
 </template>
 
 <style scoped>
