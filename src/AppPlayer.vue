@@ -6,17 +6,20 @@ import { useRollButtonListeners } from './composables/useRollButtonListeners.js'
 import GlobalRollContextMenu from './components/GlobalRollContextMenu.vue'
 import DiceRollDisplay from './components/DiceRollDisplay.vue'
 import { rollDiceWithDiceRoller } from './diceFunctions.js'
+import { getAllNotesForRoomAndPlayer, addNote as dbAddNote, updateNote, deleteNote as dbDeleteNote, clearAllNotesForRoomAndPlayer } from './dbFunctions.js'
 
 const ID = 'com.nilskk.owlbear-beyond'
-const notes = ref([])
+const notes = ref({}) // Dictionary of notes: { [id]: { text: string } }
 const newNoteText = ref('')
-const editingIndex = ref(null)
+const editingId = ref(null)
 const editingText = ref('')
 const isSaving = ref(false)
 const lastSaved = ref(null)
 const lastDiceRolls = ref([])
 const diceRollsVisible = ref(false)
 const diceRollResult = ref(null)
+const roomId = ref(null)
+const playerId = ref(null)
 let timeoutId = null
 
 const showDiceRolls = () => {
@@ -48,14 +51,11 @@ const rollDice = (value, rollMode) => {
     diceRollResult.value = null
     
     const result = rollDiceWithDiceRoller(value, rollMode, value)
-    console.log(result)
+    // console.log(result)
     
-    // Store simple result for backward compatibility
-    diceRollResult.value = result.simple
-    
-    // Add detailed result to history
-    if (result.detailed) {
-        addRollToHistory(result.detailed)
+    // Add result to history
+    if (result) {
+        addRollToHistory(result)
     }
     
     // Show dice rolls
@@ -80,87 +80,84 @@ useRollButtonListeners(fakeEmit, 'rollDice')
 
 onMounted(async () => {
     await OBR.onReady(async () => {
-        // Load saved notes from player metadata
-        const metadata = await OBR.player.getMetadata()
-        console.log('Loaded metadata:', metadata)
-        console.log('Notes key:', `${ID}/notes`)
-        console.log('Notes value:', metadata[`${ID}/notes`])
+        // Get room ID and player ID
+        roomId.value = OBR.room.id
+        playerId.value = OBR.player.id
+        console.log('Room ID:', roomId.value)
+        console.log('Player ID:', playerId.value)
         
-        if (metadata[`${ID}/notes`]) {
-            notes.value = metadata[`${ID}/notes`]
-            console.log('Restored notes:', notes.value)
-        }
+        // Load notes from database
+        const loadedNotes = await getAllNotesForRoomAndPlayer(roomId.value, playerId.value)
+        notes.value = loadedNotes
+        console.log('Loaded notes from database:', notes.value)
     })
 })
 
 const saveNotes = async () => {
-    isSaving.value = true
-    try {
-        // Create a clean copy of notes with only serializable data
-        const cleanNotes = notes.value.map(note => ({
-            id: note.id,
-            text: note.text
-        }))
+    // Not needed anymore - individual operations save directly
+    lastSaved.value = new Date().toLocaleTimeString()
+}
+
+const addNote = async () => {
+    if (newNoteText.value.trim()) {
+        const noteId = Date.now().toString()
+        const text = newNoteText.value.trim()
         
-        console.log('Saving notes:', cleanNotes)
-        console.log('Save key:', `${ID}/notes`)
+        // Add to local state
+        notes.value[noteId] = { text }
         
-        await OBR.player.setMetadata({
-            [`${ID}/notes`]: cleanNotes
-        })
+        // Save to database
+        await dbAddNote(roomId.value, playerId.value, noteId, text)
         
-        // Verify the save
-        const verifyMetadata = await OBR.player.getMetadata()
-        console.log('Verified saved metadata:', verifyMetadata)
-        console.log('Verified notes:', verifyMetadata[`${ID}/notes`])
+        newNoteText.value = ''
+        lastSaved.value = new Date().toLocaleTimeString()
+    }
+}
+
+const startEdit = (id) => {
+    editingId.value = id
+    editingText.value = notes.value[id].text
+}
+
+const saveEdit = async () => {
+    if (editingText.value.trim()) {
+        const text = editingText.value.trim()
+        
+        // Update local state
+        notes.value[editingId.value].text = text
+        
+        // Update in database
+        await updateNote(roomId.value, playerId.value, editingId.value, text)
         
         lastSaved.value = new Date().toLocaleTimeString()
-        console.log('Notes saved successfully at', lastSaved.value)
-    } catch (error) {
-        console.error('Failed to save notes:', error)
-    } finally {
-        isSaving.value = false
-    }
-}
-
-const addNote = () => {
-    if (newNoteText.value.trim()) {
-        notes.value.push({
-            id: Date.now(),
-            text: newNoteText.value.trim()
-        })
-        newNoteText.value = ''
-        saveNotes()
-    }
-}
-
-const startEdit = (index) => {
-    editingIndex.value = index
-    editingText.value = notes.value[index].text
-}
-
-const saveEdit = () => {
-    if (editingText.value.trim()) {
-        notes.value[editingIndex.value].text = editingText.value.trim()
-        saveNotes()
     }
     cancelEdit()
 }
 
 const cancelEdit = () => {
-    editingIndex.value = null
+    editingId.value = null
     editingText.value = ''
 }
 
-const deleteNote = (index) => {
-    notes.value.splice(index, 1)
-    saveNotes()
+const deleteNote = async (id) => {
+    // Delete from local state
+    delete notes.value[id]
+    
+    // Delete from database
+    await dbDeleteNote(roomId.value, playerId.value, id)
+    
+    lastSaved.value = new Date().toLocaleTimeString()
 }
 
-const clearAllNotes = () => {
+const clearAllNotes = async () => {
     if (confirm('Are you sure you want to delete all notes?')) {
-        notes.value = []
-        saveNotes()
+        // Clear local state
+        notes.value = {}
+        
+        // Clear from database
+        await clearAllNotesForRoomAndPlayer(roomId.value, playerId.value)
+        
+        lastSaved.value = new Date().toLocaleTimeString()
     }
 }
 </script>
@@ -176,7 +173,7 @@ const clearAllNotes = () => {
                 <span v-if="lastSaved" class="text-sm text-base-content/70">
                     Last saved: {{ lastSaved }}
                 </span>
-                <button @click="clearAllNotes" class="btn btn-sm btn-ghost" :disabled="notes.length === 0">
+                <button @click="clearAllNotes" class="btn btn-sm btn-ghost" :disabled="Object.keys(notes).length === 0">
                     Clear All
                 </button>
             </div>
@@ -198,17 +195,17 @@ const clearAllNotes = () => {
 
         <!-- Notes List -->
         <div class="flex-1 overflow-y-auto space-y-2">
-            <div v-if="notes.length === 0" class="text-center text-base-content/50 py-8">
+            <div v-if="Object.keys(notes).length === 0" class="text-center text-base-content/50 py-8">
                 No notes yet. Add your first note above!
             </div>
             
             <div 
-                v-for="(note, index) in notes" 
-                :key="note.id"
+                v-for="(note, id) in notes" 
+                :key="id"
                 class="flex items-center gap-2 p-3 bg-base-200 rounded-lg hover:bg-base-300 transition-colors"
             >
                 <!-- Edit Mode -->
-                <template v-if="editingIndex === index">
+                <template v-if="editingId === id">
                     <input 
                         v-model="editingText"
                         @keyup.enter="saveEdit"
@@ -231,13 +228,13 @@ const clearAllNotes = () => {
                 
                 <!-- View Mode -->
                 <template v-else>
-                    <span class="flex-1" v-html="parseText(note.text)"></span>
-                    <button @click="startEdit(index)" class="btn btn-sm btn-ghost">
+                    <span class="flex-1 min-w-0 overflow-hidden" v-html="parseText(note.text)"></span>
+                    <button @click="startEdit(id)" class="btn btn-sm btn-ghost flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
                             <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
                         </svg>
                     </button>
-                    <button @click="deleteNote(index)" class="btn btn-sm btn-ghost text-error">
+                    <button @click="deleteNote(id)" class="btn btn-sm btn-ghost text-error flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
                             <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
                         </svg>

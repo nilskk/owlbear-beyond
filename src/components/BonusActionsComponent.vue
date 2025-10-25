@@ -21,7 +21,7 @@ useRollButtonListeners(emit, 'rollDiceBonusAction');
 </script>
 
 <template>
-    <div v-if="props.monster.bonus || spellsAsBonusActions.length" class="divider divider-accent font-bold mb-0">Bonus Actions</div>
+    <div v-if="props.monster.bonus || spellsAsBonusActions.length" class="divider divider-accent text-sm font-bold mb-0 mt-1">Bonus Actions</div>
     <div v-if="props.monster.bonus || spellsAsBonusActions.length" class="px-2 pt-2 space-y-2">
         <!-- Bonus Actions -->
         <p v-for="item in props.monster.bonus" class="w-full break-words space-x-1">

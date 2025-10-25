@@ -21,7 +21,7 @@ useRollButtonListeners(emit, 'rollDiceLegendaryAction');
 </script>
 
 <template>
-    <div v-if="props.monster.legendary || spellsAsLegendaryActions.length" class="divider divider-accent font-bold mb-0">Legendary Actions</div>
+    <div v-if="props.monster.legendary || spellsAsLegendaryActions.length" class="divider divider-accent text-sm font-bold mb-0 mt-1">Legendary Actions</div>
     <div v-if="props.monster.legendary || spellsAsLegendaryActions.length" class="px-2 pt-2 space-y-2">
         <!-- Legendary Actions -->
         <p v-if="props.monster.legendary" class="w-full break-words space-x-1">

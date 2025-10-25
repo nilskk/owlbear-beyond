@@ -11,20 +11,12 @@ function rollDiceWithDiceRoller(diceString, rollMode="normal", originalNotation=
     }
     
     const roll = new DiceRoll(convertedString);
-    const diceOutput = roll.output;
     
-    return {
-        simple: processDiceOutput(diceOutput),
-        detailed: processDetailedRoll(roll, convertedString, rollMode)
-    };
+    return processRollSimple(roll, originalNotation, rollMode);
 }
 
-function processDiceOutput(diceOutput) {
-    const splitValues = diceOutput.split(/[:=]/).map(value => value.trim());
-    return splitValues;
-}
-
-function processDetailedRoll(roll, convertedString, rollMode) {
+// Keep for legacy reasons
+function processDetailedRoll(roll, originalNotation, convertedString, rollMode) {
     const dice = [];
     let modifier = 0;
     
@@ -62,6 +54,18 @@ function processDetailedRoll(roll, convertedString, rollMode) {
         dice: dice,
         modifier: originalModifier,
         breakdown: createBreakdownString(dice, originalModifier)
+    };
+}
+
+function processRollSimple(roll, originalNotation, rollMode) {
+    const outputParts = roll.output.split(':').map(part => part.trim());
+    
+    return {
+        total: roll.total,
+        notation: outputParts[0] || roll.output, // The dice notation part (e.g., "2d20dl1+5")
+        breakdown: outputParts[1] || '', // The breakdown part (e.g., "[12, 3]+5 = 15")
+        originalNotation: originalNotation,
+        rollMode: rollMode,
     };
 }
 

@@ -26,22 +26,9 @@
                     </div>
                     <!-- Divider line between total and breakdown -->
                     <div class="divider my-2 h-px bg-base-content opacity-20"></div>
-                    <div class="text-base">
-                        <div class="flex flex-wrap gap-1 items-center">
-                            <template v-for="(die, dieIndex) in roll.dice" :key="dieIndex">
-                                <span 
-                                    :class="{
-                                        'line-through opacity-50': die.isDropped,
-                                        'text-red-400': die.isMinValue && !die.isDropped,
-                                        'text-green-400': die.isMaxValue && !die.isDropped
-                                    }"
-                                    class="inline-block transition-all"
-                                >
-                                    <span class="text-lg border-2 border-current px-1 rounded">{{ die.value }}</span>
-                                </span><span v-if="dieIndex < roll.dice.length - 1" class="text-base-content">,</span>
-                            </template>
-                            <span v-if="roll.modifier" class="ml-1 text-base-content">{{ roll.modifier }}</span>
-                        </div>
+                    <div class="text-xs space-y-1">
+                        <div class="opacity-70">{{ roll.notation }}</div>
+                        <div class="opacity-90">{{ roll.breakdown }}</div>
                     </div>
                 </div>
             </div>
@@ -58,22 +45,9 @@
                     </div>
                     <!-- Divider line between total and breakdown -->
                     <div class="divider my-2 h-px bg-base-content opacity-20"></div>
-                    <div class="text-base">
-                        <div class="flex flex-wrap gap-1 items-center">
-                            <template v-for="(die, dieIndex) in lastDiceRolls[0].dice" :key="dieIndex">
-                                <span 
-                                    :class="{
-                                        'line-through opacity-50': die.isDropped,
-                                        'text-red-400': die.isMinValue && !die.isDropped,
-                                        'text-green-400': die.isMaxValue && !die.isDropped
-                                    }"
-                                    class="inline-block transition-all"
-                                >
-                                    <span class="text-lg border-2 border-current px-1 rounded">{{ die.value }}</span>
-                                </span><span v-if="dieIndex < lastDiceRolls[0].dice.length - 1" class="text-base-content">,</span>
-                            </template>
-                            <span v-if="lastDiceRolls[0].modifier" class="ml-1 text-base-content">{{ lastDiceRolls[0].modifier }}</span>
-                        </div>
+                    <div class="text-xs space-y-1">
+                        <div class="opacity-70">{{ lastDiceRolls[0].notation }}</div>
+                        <div class="opacity-90">{{ lastDiceRolls[0].breakdown }}</div>
                     </div>
                 </div>
             </div>

@@ -75,14 +75,11 @@ const rollDice = (value, rollMode) => {
     diceRollResult.value = null;
     
     const result = rollDiceWithDiceRoller(value, rollMode, value);
-    console.log(result);
+    //console.log(result);
     
-    // Store simple result for backward compatibility
-    diceRollResult.value = result.simple;
-    
-    // Add detailed result to history
-    if (result.detailed && selectedMonster.value) {
-        addRollToHistory(result.detailed, selectedMonster.value);
+    // Add result to history
+    if (result && selectedMonster.value) {
+        addRollToHistory(result, selectedMonster.value);
     }
     
     // Show dice rolls
@@ -183,9 +180,9 @@ const compositeString = computed(() => {
             </div>
             <div v-else>
                 <ArmorSpeedComponent :monster="selectedMonster" />
-                <div class="divider divider-accent font-bold mb-0">Attributes</div>
+                <div class="divider divider-accent text-sm font-bold mb-0 mt-1">Attributes</div>
                 <AttributesComponent :monster="selectedMonster" @rollDiceAttribute="rollDice" />
-                <div class="divider divider-accent font-bold mb-0">Skills</div>
+                <div class="divider divider-accent text-sm font-bold mb-0 mt-1">Skills</div>
                 <SkillsComponent :monster="selectedMonster" @rollDiceSkill="rollDice" />
                 <TraitsComponent :monster="selectedMonster" @rollDiceTrait="rollDice" />
                 <ActionsComponent :monster="selectedMonster" @rollDiceAction="rollDice" />

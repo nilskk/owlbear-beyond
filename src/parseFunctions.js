@@ -160,6 +160,7 @@ function convertSpell(value) {
 }
 
 function convertSkill(value) {
+    value = handlePipe(value);
     return `<span class="text-primary">${value}</span>`;
 }
 

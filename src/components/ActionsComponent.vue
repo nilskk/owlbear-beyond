@@ -21,7 +21,7 @@ useRollButtonListeners(emit, 'rollDiceAction');
 </script>
 
 <template>
-    <div v-if="props.monster.action || spellsAsActions.length" class="divider divider-accent font-bold mb-0">Actions</div>
+    <div v-if="props.monster.action || spellsAsActions.length" class="divider divider-accent text-sm font-bold mb-0 mt-1">Actions</div>
     <div v-if="props.monster.action || spellsAsActions.length" class="px-2 pt-2 space-y-2">
         <!-- Actions -->
         <p v-for="item in props.monster.action" class="w-full break-words space-x-1">
