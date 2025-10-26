@@ -5,6 +5,8 @@ import { parseText } from './parseFunctions.js'
 import { useRollButtonListeners } from './composables/useRollButtonListeners.js'
 import GlobalRollContextMenu from './components/GlobalRollContextMenu.vue'
 import DiceRollDisplay from './components/DiceRollDisplay.vue'
+import GameTermTooltip from './components/GameTermTooltip.vue'
+import NavbarComponent from './components/navbar/NavbarComponent.vue'
 import { rollDiceWithDiceRoller } from './diceFunctions.js'
 import { getAllNotesForRoomAndPlayer, addNote as dbAddNote, updateNote, deleteNote as dbDeleteNote, clearAllNotesForRoomAndPlayer } from './dbFunctions.js'
 
@@ -21,6 +23,11 @@ const diceRollResult = ref(null)
 const roomId = ref(null)
 const playerId = ref(null)
 let timeoutId = null
+
+// Dummy data for navbar
+const selectedMonster = ref({ name: 'My Custom Rolls' })
+const groupedBestiary = ref({})
+const playerSelection = ref(null)
 
 const showDiceRolls = () => {
     diceRollsVisible.value = true
@@ -150,37 +157,33 @@ const deleteNote = async (id) => {
 }
 
 const clearAllNotes = async () => {
-    if (confirm('Are you sure you want to delete all notes?')) {
-        // Clear local state
-        notes.value = {}
-        
-        // Clear from database
-        await clearAllNotesForRoomAndPlayer(roomId.value, playerId.value)
-        
-        lastSaved.value = new Date().toLocaleTimeString()
-    }
+    // Clear local state
+    notes.value = {}
+    
+    // Clear from database
+    await clearAllNotesForRoomAndPlayer(roomId.value, playerId.value)
+    
+    lastSaved.value = new Date().toLocaleTimeString()
 }
 </script>
 
 <template>
     <GlobalRollContextMenu />
+    <GameTermTooltip />
     
-    <div class="flex flex-col h-screen p-4 gap-4">
-        <!-- Header -->
-        <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold">Player Rolls</h1>
-            <div class="flex gap-2 items-center">
-                <span v-if="lastSaved" class="text-sm text-base-content/70">
-                    Last saved: {{ lastSaved }}
-                </span>
-                <button @click="clearAllNotes" class="btn btn-sm btn-ghost" :disabled="Object.keys(notes).length === 0">
-                    Clear All
-                </button>
-            </div>
-        </div>
-
-        <!-- Add New Note Input -->
-        <div class="flex gap-2">
+    <div class="flex flex-col h-screen">
+        <NavbarComponent 
+            :selectedMonster="selectedMonster"
+            :groupedBestiary="groupedBestiary"
+            :playerSelection="playerSelection"
+            :isGmView="false"
+            :notesCount="Object.keys(notes).length"
+            @clearNotes="clearAllNotes"
+        />
+        
+        <div class="flex flex-col flex-1 overflow-y-auto p-4 gap-4">
+            <!-- Add New Note Input -->
+            <div class="flex gap-2">
             <input 
                 v-model="newNoteText"
                 @keyup.enter="addNote"
@@ -247,6 +250,7 @@ const clearAllNotes = async () => {
         <div class="text-sm text-base-content/70">
             <p>💡 Tip: Click on any note to edit it. Your notes auto-save and persist across sessions.</p>
             <p>🎲 Example: Longsword - {@hit 6} {@damage 1d8+3}</p>
+        </div>
         </div>
 
         <!-- Round D20 Toggle Button -->

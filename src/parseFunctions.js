@@ -1,4 +1,6 @@
 
+import { CONDITIONS, HAZARDS } from './glossary.js';
+
 function capitalize(value) {
     if (!value) return '';
     return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
@@ -138,14 +140,35 @@ function convertCreature(value) {
 }
 
 function convertStatus(value) {
-    let displayValue = handlePipe(value, 'last');
-    return `<span class="text-primary">${displayValue}</span>`;
+    value = handlePipe(value, 'last');
+    const conditionKey = value.toLowerCase().trim();
+    
+    // Check if this condition exists in our glossary
+    const description = CONDITIONS[conditionKey] || HAZARDS[conditionKey];
+    
+    if (description) {
+        // Use the full HTML description for the tooltip
+        return `<span class="text-accent game-term cursor-help" data-term="${value}" data-description="${description}">${value}</span>`;
+    }
+    
+    // Fallback to plain text if not in glossary
+    return `<span class="text-primary">${value}</span>`;
 }
 
 function convertCondition(value) {
     value = handlePipe(value);
-    const linkValue = capitalize(value.replace(/[^a-zA-Z\s]/g, '').replace(/\s+/g, '-'));
-    return `<a href="https://www.dndbeyond.com/sources/dnd/free-rules/rules-glossary#${linkValue}Condition" target="_blank" class="link link-primary">${value}</a>`;
+    const conditionKey = value.toLowerCase().trim();
+    
+    // Check if this condition exists in our glossary
+    const description = CONDITIONS[conditionKey] || HAZARDS[conditionKey];
+    
+    if (description) {
+        // Use the full HTML description for the tooltip
+        return `<span class="text-accent game-term cursor-help" data-term="${value}" data-description="${description}">${value}</span>`;
+    }
+    
+    // Fallback to plain text if not in glossary
+    return `<span class="text-primary">${value}</span>`;
 }
 
 function convertItem(value) {

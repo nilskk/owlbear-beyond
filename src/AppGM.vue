@@ -7,10 +7,10 @@ import ActionsComponent from './components/ActionsComponent.vue';
 import BonusActionsComponent from './components/BonusActionsComponent.vue';
 import ReactionsComponent from './components/ReactionsComponent.vue';
 import LegendaryActionsComponent from './components/LegendaryActionsComponent.vue';
-import LinkTokenModal from './components/LinkTokenModal.vue';
-import NavbarComponent from './components/NavbarComponent.vue';
+import NavbarComponent from './components/navbar/NavbarComponent.vue';
 import GlobalRollContextMenu from './components/GlobalRollContextMenu.vue';
 import DiceRollDisplay from './components/DiceRollDisplay.vue';
+import GameTermTooltip from './components/GameTermTooltip.vue';
 import { ref, computed, onMounted } from 'vue'
 import { db } from './db'
 import { rollDiceWithDiceRoller } from './diceFunctions';
@@ -19,7 +19,6 @@ import OBR from '@owlbear-rodeo/sdk';
 
 const ID = 'com.nilskk.owlbear-beyond';
 
-const linkTokenModal = ref(null);
 const playerSelection = ref(null)
 const selectedMonster = ref(null);
 const groupedBestiary = ref({});
@@ -145,10 +144,6 @@ function showMonsterSheet(item) {
 OBR.player.onChange(handlePlayerChange);
 OBR.scene.items.onChange(handleGrimoireInitiaveChange);
 
-const updateTokens = () => {
-    linkTokenModal.value.openModal();
-};
-
 const compositeString = computed(() => {
     if (!selectedMonster.value || !diceRollResult.value) return '';
     return `${selectedMonster.value.name} rolls ${diceRollResult.value[0]}`;
@@ -157,12 +152,8 @@ const compositeString = computed(() => {
 </script>
 
 <template>
-    <LinkTokenModal 
-        ref="linkTokenModal"
-        :playerSelection="playerSelection" 
-        :selectedMonster="selectedMonster" 
-    />
     <GlobalRollContextMenu />
+    <GameTermTooltip />
     
     <div class="flex flex-col h-screen">
         <NavbarComponent 
@@ -170,7 +161,6 @@ const compositeString = computed(() => {
             :groupedBestiary="groupedBestiary"
             :playerSelection="playerSelection"
             @selectMonster="selectMonster"
-            @updateTokens="updateTokens"
         />
         <div v-if="selectedMonster" class="overflow-y-auto overflow-x-hidden flex-1">
             <div v-if="selectedMonster._copy">
