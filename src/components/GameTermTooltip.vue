@@ -32,39 +32,34 @@ const hideTooltip = () => {
     tooltipState.value.visible = false
 }
 
-// Event listener setup
-const setupEventListeners = () => {
-    // Use event delegation to handle hover events on dynamically added game terms
-    document.addEventListener('mouseenter', (event) => {
-        if (event.target.classList.contains('game-term')) {
-            // Don't show tooltip if inside a modal
-            if (event.target.closest('.modal')) {
-                return
-            }
-            const term = event.target.getAttribute('data-term')
-            const description = event.target.getAttribute('data-description')
-            showTooltip(event, term, description)
+// Event handlers
+const handleMouseEnter = (event) => {
+    if (event.target && event.target.classList && event.target.classList.contains('game-term')) {
+        // Don't show tooltip if inside a modal
+        if (event.target.closest('.modal')) {
+            return
         }
-    }, true) // Use capture phase for better event handling
-    
-    document.addEventListener('mouseleave', (event) => {
-        if (event.target.classList.contains('game-term')) {
-            hideTooltip()
-        }
-    }, true)
+        const term = event.target.getAttribute('data-term')
+        const description = event.target.getAttribute('data-description')
+        showTooltip(event, term, description)
+    }
 }
 
-const removeEventListeners = () => {
-    document.removeEventListener('mouseenter', setupEventListeners)
-    document.removeEventListener('mouseleave', setupEventListeners)
+const handleMouseLeave = (event) => {
+    if (event.target && event.target.classList && event.target.classList.contains('game-term')) {
+        hideTooltip()
+    }
 }
 
 // Lifecycle hooks
 onMounted(() => {
-    setupEventListeners()
+    // Use event delegation to handle hover events on dynamically added game terms
+    document.addEventListener('mouseenter', handleMouseEnter, true)
+    document.addEventListener('mouseleave', handleMouseLeave, true)
 })
 
 onUnmounted(() => {
-    removeEventListeners()
+    document.removeEventListener('mouseenter', handleMouseEnter, true)
+    document.removeEventListener('mouseleave', handleMouseLeave, true)
 })
 </script>
