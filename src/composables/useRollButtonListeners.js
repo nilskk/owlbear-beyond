@@ -10,14 +10,14 @@ export function useRollButtonListeners(emit, eventName = 'rollDice') {
         const buttons = document.getElementsByClassName('rollButton');
         
         Array.from(buttons).forEach(button => {
-            // Remove any existing listeners to avoid duplicates
-            const clone = button.cloneNode(true);
-            button.parentNode.replaceChild(clone, button);
-        });
-        
-        // Re-query buttons after clone
-        const freshButtons = document.getElementsByClassName('rollButton');
-        Array.from(freshButtons).forEach(button => {
+            // Check if listeners are already attached using a data attribute
+            if (button.dataset.listenersAttached === 'true') {
+                return;
+            }
+            
+            // Mark that listeners are attached
+            button.dataset.listenersAttached = 'true';
+            
             // Left click - normal roll
             button.addEventListener('click', (event) => {
                 event.preventDefault();

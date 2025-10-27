@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 import { capitalize } from '../parseFunctions';
 import { useRollButtonListeners } from '../composables/useRollButtonListeners';
 
@@ -7,6 +8,54 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['rollDiceSkill'])
+
+// Parse skill value to extract all modifiers (base and conditionals)
+const parseSkillValue = (skillValue) => {
+    // Find all modifiers in the format +X or -X
+    const modifierRegex = /([+-]\d+)/g;
+    const modifiers = [];
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = modifierRegex.exec(skillValue)) !== null) {
+        // Add text before this modifier as plain text
+        if (match.index > lastIndex) {
+            const textBefore = skillValue.substring(lastIndex, match.index);
+            if (textBefore.trim()) {
+                parts.push({ type: 'text', value: textBefore });
+            }
+        }
+        
+        // Add the modifier as a button
+        parts.push({ type: 'button', value: match[1] });
+        lastIndex = match.index + match[1].length;
+    }
+    
+    // Add any remaining text after the last modifier
+    if (lastIndex < skillValue.length) {
+        const textAfter = skillValue.substring(lastIndex);
+        if (textAfter.trim()) {
+            parts.push({ type: 'text', value: textAfter });
+        }
+    }
+    
+    return {
+        parts,
+        hasButtons: parts.some(p => p.type === 'button')
+    };
+}
+
+// Compute parsed skills once
+const parsedSkills = computed(() => {
+    if (!props.monster.skill) return [];
+    
+    return Object.entries(props.monster.skill).map(([key, value]) => ({
+        name: key,
+        originalValue: value,
+        parsed: parseSkillValue(value)
+    }));
+});
 
 useRollButtonListeners(emit, 'rollDiceSkill');
 
@@ -17,9 +66,15 @@ useRollButtonListeners(emit, 'rollDiceSkill');
         <!-- Skills -->
         <p v-if="props.monster.skill" class="w-full break-words space-x-1">
             <span class="font-bold">Skills:</span>
-            <span v-for="(item, key) in props.monster.skill" class="break-words space-x-1">
-                <span class="">{{ capitalize(key) }}</span>
-                <button class="btn btn-xs btn-outline btn-secondary font-bold rollButton">{{ item }}</button>
+            <span v-for="skill in parsedSkills" :key="skill.name" class="break-words space-x-1">
+                <span class="">{{ capitalize(skill.name) }}</span>
+                <template v-if="skill.parsed.hasButtons">
+                    <template v-for="(part, index) in skill.parsed.parts" :key="index">
+                        <button v-if="part.type === 'button'" class="btn btn-xs btn-outline btn-secondary font-bold rollButton">{{ part.value }}</button>
+                        <span v-else class="text-sm text-base-content/70">{{ part.value }}</span>
+                    </template>
+                </template>
+                <span v-else class="text-primary">{{ skill.originalValue }}</span>
                 <span class="">,</span>
             </span>
         </p>
