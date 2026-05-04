@@ -104,6 +104,9 @@ function parseText(value) {
         }
     });
 
+    // Replace newlines with <br> tags for multiline display
+    value = value.replace(/\n/g, '<br>');
+
     return value;
 
 }

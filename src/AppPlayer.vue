@@ -184,12 +184,11 @@ const clearAllNotes = async () => {
         <div class="flex flex-col flex-1 overflow-y-auto p-4 gap-4">
             <!-- Add New Note Input -->
             <div class="flex gap-2">
-            <input 
+            <textarea 
                 v-model="newNoteText"
-                @keyup.enter="addNote"
-                type="text" 
-                placeholder="Add a new note..." 
-                class="input input-bordered flex-1"
+                @keyup.ctrl.enter="addNote"
+                placeholder="Add a new note... (Ctrl+Enter to add)" 
+                class="textarea textarea-bordered flex-1 max-h-24"
             />
             <button @click="addNote" class="btn btn-primary" :disabled="!newNoteText.trim()">
                 Add
@@ -209,12 +208,11 @@ const clearAllNotes = async () => {
             >
                 <!-- Edit Mode -->
                 <template v-if="editingId === id">
-                    <input 
+                    <textarea 
                         v-model="editingText"
-                        @keyup.enter="saveEdit"
+                        @keyup.ctrl.enter="saveEdit"
                         @keyup.esc="cancelEdit"
-                        type="text" 
-                        class="input input-bordered flex-1"
+                        class="textarea textarea-bordered flex-1 max-h-32"
                         autofocus
                     />
                     <button @click="saveEdit" class="btn btn-sm btn-success">
@@ -231,7 +229,7 @@ const clearAllNotes = async () => {
                 
                 <!-- View Mode -->
                 <template v-else>
-                    <span class="flex-1 min-w-0 overflow-hidden" v-html="parseText(note.text)"></span>
+                    <div class="flex-1 min-w-0 whitespace-pre-wrap break-words" v-html="parseText(note.text)"></div>
                     <button @click="startEdit(id)" class="btn btn-sm btn-ghost flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
                             <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
